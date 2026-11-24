@@ -325,7 +325,7 @@ function renderPlayBoard(anim){
   const w = lp && lp.wW != null ? lp.wW : 50; const f = $('#play-evf');
   f.style.height = (PL.flipped ? 100 - w : w) + '%'; f.style.top = PL.flipped ? '0' : 'auto'; f.style.bottom = PL.flipped ? 'auto' : '0';
   const bar = (c, top) => { const me = c === PL.you, nm = me ? (linkedAcc() ? linkedAcc().name : 'You') : coach().name;
-    return `${me ? `<div class="av s">${esc(nm[0].toUpperCase())}</div>` : coachAvatar(32)}<div style="min-width:0"><span class="nm">${esc(nm)}</span> <span class="rt">${me ? '' : '(' + LEVELS[PL.lvl].n + ' · ' + LEVELS[PL.lvl].elo + ')'}</span><div class="cap">${capturedHTML(fen, c)}</div></div>${PL.ch.turn() === c && !PL.over ? `<span class="clk live" style="font-family:inherit;font-size:12px">${me ? 'Your move' : 'Thinking…'}</span>` : ''}`; };
+    return `${me ? `<div class="av s">${esc(nm[0].toUpperCase())}</div>` : coachAvatar(32)}<div style="min-width:0"><span class="nm">${esc(nm)}</span> <span class="rt">${me ? '' : '(' + LEVELS[PL.lvl].n + ' · ' + LEVELS[PL.lvl].elo + ')'}</span><div class="cap">${capturedHTML(fen, c)}</div></div>${PL.G && PL.ch.turn() === c && !PL.over ? `<span class="clk live" style="font-family:inherit;font-size:12px">${me ? 'Your move' : 'Thinking…'}</span>` : ''}`; };
   const top = PL.flipped ? 'w' : 'b';
   $('#pp-top').innerHTML = bar(top); $('#pp-bot').innerHTML = bar(top === 'w' ? 'b' : 'w');
 }

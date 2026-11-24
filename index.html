@@ -6,11 +6,17 @@
 <title>BrillMove — Free Chess Game Review</title>
 <meta name="description" content="Free, unlimited chess game review powered by Stockfish 17. Load your Chess.com games, see every brilliant move and blunder, and learn what you could have played better.">
 <meta name="theme-color" content="#2563eb">
-<link rel="icon" href="pieces/cburnett/wN.svg">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BrillMove">
+<script>try{var t=(JSON.parse(localStorage.getItem('gl2_settings')||'{}').theme)||'light';if(t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark'}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=7">
+<link rel="stylesheet" href="styles.css?v=9">
 <script src="vendor/chess.min.js"></script>
 </head>
 <body>
@@ -54,6 +60,10 @@
   <symbol id="ico-swords" viewBox="0 0 24 24"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2M9.5 6.5 14 2h3v3l-4.5 4.5M5 14l-2 2 4 4 2-2"/></symbol>
   <symbol id="ico-heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/></symbol>
   <symbol id="ico-palette" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="1"/><circle cx="17.5" cy="10.5" r="1"/><circle cx="8.5" cy="7.5" r="1"/><circle cx="6.5" cy="12.5" r="1"/><path d="M12 2a10 10 0 0 0 0 20c.9 0 1.6-.7 1.6-1.7 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.9.7-1.7 1.7-1.7h2A5.5 5.5 0 0 0 22 11c0-5-4.5-9-10-9z"/></symbol>
+  <symbol id="ico-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></symbol>
+  <symbol id="ico-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="ico-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+  <symbol id="ico-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></symbol>
   <symbol id="ico-rook" viewBox="0 0 24 24"><path d="M5 21h14M7 21v-3h10v3M8 18l1-8h6l1 8M7 10h10V4h-2.5v2h-2V4h-1v2h-2V4H7z"/></symbol>
 </svg>
 
@@ -70,6 +80,8 @@
   </nav>
   <div class="sp"></div>
   <button class="btn sm ghost hidden" id="me-chip" title="Your linked account"></button>
+  <button class="btn sm soft b-install hidden" title="Install BrillMove as an app"><svg class="i sm"><use href="#ico-phone"/></svg><span class="t">Install app</span></button>
+  <button class="ibtn" id="b-theme" title="Dark mode" aria-label="Toggle dark mode"></button>
   <button class="ibtn" id="b-sound" title="Sound on/off" aria-label="Sound on/off"></button>
   <button class="ibtn" id="b-settings" title="Settings" aria-label="Settings"><svg class="i"><use href="#ico-sliders"/></svg></button>
   <button class="ibtn" id="b-gallery" title="Saved moments" aria-label="Saved moments"><svg class="i"><use href="#ico-bookmark"/></svg><span class="cnt hidden" id="saved-n">0</span></button>
@@ -133,6 +145,9 @@
       <div class="feat"><div class="ic"><svg class="i"><use href="#ico-chart"/></svg></div><h3>Coach report</h3><p>Your coach reads your last 10–30 games and tells you your weakest points, your strengths, your style and what to practice.</p></div>
       <div class="feat"><div class="ic"><svg class="i"><use href="#ico-swords"/></svg></div><h3>Play the coach</h3><p>Practice against 7 strength levels. Your coach comments on every move and profiles your playing style live.</p></div>
       <div class="feat"><div class="ic"><svg class="i"><use href="#ico-user"/></svg></div><h3>Link your account</h3><p>Link your Chess.com username once. Next time you visit after a game, your coach offers to review it with you.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-phone"/></svg></div><h3>Install it as an app</h3><p>Add BrillMove to your phone or computer. It opens full screen, and the engine stays saved for faster reviews.</p><button class="btn sm soft b-install" style="margin-top:12px">Install BrillMove</button></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-link"/></svg></div><h3>Share any review</h3><p>Every Chess.com game gets its own link. Send a friend straight to your brilliant move, or to the full review.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-moon"/></svg></div><h3>Light and dark mode</h3><p>Easy on the eyes day or night, with board colors and seven piece sets to choose from.</p></div>
       <div class="feat"><div class="ic"><svg class="i"><use href="#ico-image"/></svg></div><h3>Share cards</h3><p>Turn a great move or a full game summary into a clean image you can download or copy.</p></div>
     </div>
   </div>
@@ -180,8 +195,8 @@
     <div class="card">
       <div class="hunt-hero">
         <div class="ic" id="hunt-big"></div>
-        <div style="flex:1;min-width:220px"><h3 style="margin:0 0 4px;font-size:17px">Brilliant Hunter</h3><div class="muted" style="font-size:14px">Scans your most recent games from the list (current month and filters) with a fast engine pass, then collects every brilliant and great move you played.</div></div>
-        <div class="row"><select class="in" id="hunt-n"><option value="5">Last 5 games</option><option value="10" selected>Last 10 games</option><option value="20">Last 20 games</option></select><button class="btn pri" id="b-hunt">Start scan</button></div>
+        <div style="flex:1;min-width:220px"><h3 style="margin:0 0 4px;font-size:17px">Brilliant Hunter</h3><div class="muted" style="font-size:14px">Searches your game history for brilliant moves only. A fast filter finds every real sacrifice, then Stockfish checks each one. Results are saved, so the next scan picks up where you left off.</div></div>
+        <div class="row"><select class="in" id="hunt-n"><option value="20">Last 20 games</option><option value="50">Last 50 games</option><option value="100" selected>Last 100 games</option><option value="250">Last 250 games</option><option value="500">Last 500 games</option><option value="1000">Last 1,000 games</option><option value="all">All game history</option></select><button class="btn pri" id="b-hunt">Start scan</button></div>
       </div>
       <div id="hunt-prog" class="hidden"><div class="row" style="margin-top:16px"><div class="spin"></div><span id="hunt-status">Starting…</span></div><div class="prog"><div id="hunt-bar"></div></div></div>
     </div>
@@ -304,8 +319,9 @@
 </footer>
 
 <div class="modal hidden" id="modal"><div class="mbox" id="mbox"></div></div>
-<script src="fx.js?v=4"></script>
-<script src="app.js?v=7"></script>
-<script src="coach.js?v=5"></script>
+<script src="fx.js?v=8"></script>
+<script src="app.js?v=8"></script>
+<script src="coach.js?v=8"></script>
+<script src="extras.js?v=8"></script>
 </body>
 </html>

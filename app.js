@@ -390,7 +390,7 @@ function buildGame(pgn, meta = {}){
     result: h.Result || '*', date: (h.Date || '').replace(/\./g, '-').replace(/\?+/g, ''),
     opening: openingName(h.ECOUrl) || h.Opening || '', termination: h.Termination || '',
     userColor: meta.userColor || null, url: meta.url || h.Link || '', timeClass: meta.timeClass || '',
-    wAv: meta.wAv || '', bAv: meta.bAv || '', fromApi: !!meta.fromApi,
+    wAv: meta.wAv || '', bAv: meta.bAv || '', fromApi: !!meta.fromApi, end: meta.end || 0, user: meta.user || '',
   };
   const id = M.url ? 'u' + hashStr(M.url) : 'p' + hashStr(positions[0].fen + moves.map(m => m.uci).join(''));
   return {id, meta: M, pgn, positions, moves, clocks, done: false, depth: 0};
@@ -544,7 +544,7 @@ const HOW = {checkmated: 'checkmate', resigned: 'resignation', timeout: 'time', 
 function howEnded(g){ const r = resOf(g), me = meOf(g) === 'w' ? g.white : g.black, op = meOf(g) === 'w' ? g.black : g.white; return HOW[r === 'W' ? op.result : me.result] || ''; }
 async function fetchArchive(url){ if (!S.arch[url]) S.arch[url] = (await api(url)).games || []; return S.arch[url]; }
 function metaFromGame(g){
-  return {white: g.white.username, black: g.black.username, wElo: g.white.rating, bElo: g.black.rating, userColor: S.user ? meOf(g) : null, url: g.url, timeClass: g.time_class, fromApi: true};
+  return {white: g.white.username, black: g.black.username, wElo: g.white.rating, bElo: g.black.rating, userColor: S.user ? meOf(g) : null, url: g.url, timeClass: g.time_class, fromApi: true, end: g.end_time, user: S.user || ''};
 }
 
 let userTok = 0;
@@ -667,6 +667,7 @@ function renderGames(){
   $('#res-chips').innerHTML = [['all', 'Any result'], ['W', 'Wins'], ['L', 'Losses'], ['D', 'Draws']].map(([v, l]) => chip('res', v, l, S.res)).join('');
   const list = filteredGames();
   if (!list.length) { $('#glist').innerHTML = '<div class="card muted">No games match these filters.</div>'; return; }
+  const bh = huntStore(S.user).g;
   $('#glist').innerHTML = list.map(g => {
     const c = meOf(g), me = c === 'w' ? g.white : g.black, op = c === 'w' ? g.black : g.white, r = resOf(g);
     const variant = g.rules !== 'chess';
@@ -676,7 +677,7 @@ function renderGames(){
     const acc = sum ? {me: sum[c], op: sum[c === 'w' ? 'b' : 'w']} : g.accuracies ? {me: g.accuracies[c === 'w' ? 'white' : 'black'], op: g.accuracies[c === 'w' ? 'black' : 'white']} : null;
     return `<div class="gc" data-url="${esc(g.url)}" ${variant ? 'style="opacity:.5"' : ''}>
       <div class="res ${r}">${r}</div>
-      <div style="min-width:0"><div class="who"><span class="cdot ${c}"></span>vs ${esc(op.username)} <span class="muted" style="font-weight:500">(${op.rating})</span>${sum ? '<span class="pill" style="padding:2px 8px;color:#96bc4b">✓ Reviewed</span>' : ''}</div>
+      <div style="min-width:0"><div class="who"><span class="cdot ${c}"></span>vs ${esc(op.username)} <span class="muted" style="font-weight:500">(${op.rating})</span>${sum ? '<span class="pill green" style="padding:2px 8px">Reviewed</span>' : ''}${bh[gid(g.url)] ? `<span class="pill" title="Brilliant moves in this game" style="padding:2px 8px 2px 3px;color:#0f766e;border-color:#9fe3df;background:#effcfb">${clsIcon('brilliant', 16)}×${bh[gid(g.url)].b.length}</span>` : ''}</div>
         <div class="sub"><span class="tcic">${TCI[g.time_class] || ''}</span> ${esc(g.time_class)} · ${date}${how ? ' · by ' + esc(how) : ''}${variant ? ' · ' + esc(g.rules) + ' (not supported)' : ''}${op1 ? ' · ' + esc(op1) : ''}</div></div>
       <div class="accs">${acc && acc.me != null ? `<span class="pill" title="Your accuracy">You <b style="color:var(--text)">${(+acc.me).toFixed(1)}</b></span><span class="pill" title="Opponent accuracy">Opp ${(+acc.op).toFixed(1)}</span>` : ''}</div>
       <button class="btn sm ${variant ? '' : 'pri'}" ${variant ? 'disabled' : ''}>${sum ? 'Open' : 'Review'}</button></div>`;
@@ -756,50 +757,141 @@ function drawRatingChart(games){
 }
 
 /* ---------------- brilliant hunter ---------------- */
+/* ---------------- brilliant hunter (whole game history) ----------------
+   Fast path: a brilliant needs a real sacrifice, so we first check every one of
+   your moves with chess rules only (does it newly leave material en prise?).
+   Only those candidate positions go to the engine. Results are saved per game,
+   so a rescan or a bigger range resumes instantly. */
 let huntRes = null;
-async function runHunt(){
-  if (S.hunting) { S.huntGen++; S.hunting = false; if (engine) engine.stop(); $('#b-hunt').textContent = 'Start scan'; $('#hunt-prog').classList.add('hidden'); return; }
-  const n = +$('#hunt-n').value, list = filteredGames().filter(g => g.rules === 'chess').slice(0, n);
-  if (!list.length) { toast('No games to scan with the current filters.'); return; }
-  const gen = ++S.huntGen; S.hunting = true;
-  $('#b-hunt').textContent = 'Stop'; $('#hunt-prog').classList.remove('hidden');
-  huntRes = {games: [], n: list.length};
-  for (let k = 0; k < list.length; k++) {
-    let G; try { G = buildGame(list[k].pgn, metaFromGame(list[k])); } catch(e) { continue; }
-    const ok = await analyzeGame(G, 11, (i, N) => {
-      if (gen !== S.huntGen) return;
-      $('#hunt-status').textContent = `Game ${k + 1} of ${list.length} · vs ${(G.meta.userColor === 'w' ? G.meta.black : G.meta.white)} · move ${Math.ceil(i / 2)}`;
-      $('#hunt-bar').style.width = ((k + i / N) / list.length * 100) + '%';
-    }, () => gen !== S.huntGen);
-    if (!ok || gen !== S.huntGen) return;
-    huntRes.games.push(G); renderHunt();
+const gid = url => (url || '').split('/').pop();
+const huntStore = u => store.get('gl2_bh_' + u, {g: {}});
+function captureLosses(fen){
+  const ch = new Chess(fen), out = new Set();
+  for (const c of ch.moves({verbose: true})) {
+    if (!c.captured || VAL[c.captured] < 3) continue;
+    ch.move(c);
+    const recap = ch.moves({verbose: true}).some(r => r.to === c.to);
+    ch.undo();
+    const net = recap ? VAL[c.captured] - VAL[c.piece] : VAL[c.captured];
+    if (net >= 2) out.add(c.to + c.captured);
   }
-  S.hunting = false; $('#b-hunt').textContent = 'Scan again'; $('#hunt-prog').classList.add('hidden');
-  const b = huntRes.games.reduce((a, G) => a + countOf(G, G.meta.userColor, 'brilliant'), 0);
-  if (b) { Sound.play('brilliant'); const r = $('#hunt-out').getBoundingClientRect(); Confetti.burst(innerWidth / 2, Math.max(120, r.top)); }
+  return out;
 }
+function flipTurn(fen){ const p = fen.split(' '); p[1] = p[1] === 'w' ? 'b' : 'w'; p[3] = '-'; return p.join(' '); }
+function isSacCandidate(G, i){
+  const m = G.moves[i]; if (m.forced) return false;
+  const after = captureLosses(G.positions[i + 1].fen); if (!after.size) return false;
+  let before; try { before = captureLosses(flipTurn(G.positions[i].fen)); } catch(e) { before = new Set(); }
+  const fresh = [...after].filter(x => !before.has(x)); if (!fresh.length) return false;
+  if (m.captured && VAL[m.captured] >= 3 && fresh.every(x => x.slice(0, 2) === m.to && VAL[x[2]] <= VAL[m.captured] + 1)) return false;
+  return true;
+}
+async function analyzePosInto(G, k, depth, cancelled){
+  const pos = G.positions[k]; if (pos.wW != null) return true;
+  const ch = new Chess(pos.fen);
+  if (ch.in_checkmate()) { pos.score = {type: 'mate', v: 0}; pos.lines = {}; pos.best = null; }
+  else if (ch.game_over()) { pos.score = {type: 'cp', v: 0}; pos.lines = {}; pos.best = null; }
+  else { const r = await getEngine().analyse(pos.fen, depth); if (cancelled()) return false; pos.lines = r.lines; pos.best = r.best; const l1 = r.lines[1]; pos.score = l1 ? {type: l1.type, v: l1.v} : {type: 'cp', v: 0}; }
+  pos.wW = pos.turn === 'w' ? scoreWin(pos.score) : 100 - scoreWin(pos.score);
+  return true;
+}
+async function scanGameBrilliants(g, cancelled){
+  let G; try { G = buildGame(g.pgn, metaFromGame(g)); } catch(e) { return []; }
+  const c = G.meta.userColor, found = [];
+  for (let i = 0; i < G.moves.length; i++) {
+    if (G.moves[i].color !== c || !isSacCandidate(G, i)) continue;
+    if (!await analyzePosInto(G, i, 14, cancelled) || !await analyzePosInto(G, i + 1, 14, cancelled)) return null;
+    classify(G, i);
+    if (G.moves[i].cls === 'brilliant') found.push([i + 1, G.moves[i].san, G.positions[i + 1].fen, G.moves[i].uci]);
+  }
+  return found;
+}
+async function runHunt(){
+  if (S.hunting) { S.huntGen++; S.hunting = false; if (engine) engine.stop(); $('#b-hunt').textContent = 'Resume scan'; $('#hunt-prog').classList.add('hidden'); renderHunt(); return; }
+  const u = S.user, N = $('#hunt-n').value, target = N === 'all' ? Infinity : +N, gen = ++S.huntGen;
+  const d = huntStore(u); let dirty = 0, scanned = 0, fresh = 0;
+  S.hunting = true; $('#b-hunt').textContent = 'Stop'; $('#hunt-prog').classList.remove('hidden');
+  huntRes = {u, scanned: 0, target, items: [], done: false};
+  const save = () => { if (!store.set('gl2_bh_' + u, d)) toast('Storage is full; some scan results were not saved.'); dirty = 0; };
+  const tStart = Date.now();
+  for (let ai = 0; ai < S.archives.length && scanned < target; ai++) {
+    if (gen !== S.huntGen) return;
+    let games;
+    try { games = S.arch[S.archives[ai]] || (await api(S.archives[ai])).games || []; } catch(e) { continue; }
+    games = games.filter(g => g.rules === 'chess').sort((a, b) => b.end_time - a.end_time);
+    const [y, mo] = S.archives[ai].split('/').slice(-2), month = new Date(+y, +mo - 1).toLocaleString(undefined, {month: 'short', year: 'numeric'});
+    for (const g of games) {
+      if (scanned >= target || gen !== S.huntGen) break;
+      const id = gid(g.url); let rec = d.g[id];
+      if (rec === undefined) {
+        const f = await scanGameBrilliants(g, () => gen !== S.huntGen);
+        if (f === null || gen !== S.huntGen) { save(); return; }
+        const meOpp = g.white.username.toLowerCase() === u ? g.black : g.white;
+        rec = f.length ? {o: meOpp.username, r: meOpp.rating, d: g.end_time, t: g.time_class, c: g.white.username.toLowerCase() === u ? 'w' : 'b', u: g.url, b: f} : 0;
+        d.g[id] = rec; dirty++; fresh++;
+        if (dirty >= 15) save();
+        if (rec) { Sound.play('great'); renderHunt(); }
+      }
+      scanned++; huntRes.scanned = scanned;
+      if (scanned % 5 === 0 || rec) {
+        const rate = fresh ? (Date.now() - tStart) / fresh : 0;
+        $('#hunt-status').innerHTML = `Scanned <b>${scanned.toLocaleString()}</b>${isFinite(target) ? ' of ' + target.toLocaleString() : ''} games · now in <b>${month}</b> · <b>${countHunt(u)}</b> brilliant${countHunt(u) === 1 ? '' : 's'} found${isFinite(target) && rate ? ` · about ${fmtDur((target - scanned) * rate)} left` : ''}`;
+        $('#hunt-bar').style.width = (isFinite(target) ? scanned / target : (ai + 1) / S.archives.length) * 100 + '%';
+      }
+    }
+    if (ai % 2 === 1) renderHunt();
+  }
+  save();
+  S.hunting = false; huntRes.done = true;
+  $('#b-hunt').textContent = 'Scan again'; $('#hunt-prog').classList.add('hidden');
+  renderHunt();
+  const n = countHunt(u);
+  if (n) { Sound.play('brilliant'); const r = $('#hunt-out').getBoundingClientRect(); Confetti.burst(innerWidth / 2, Math.max(120, r.top)); }
+  toast(`Scan complete: ${scanned.toLocaleString()} games, ${n} brilliant move${n === 1 ? '' : 's'}`);
+  if (S.ptab === 'games') renderGames();
+}
+const fmtDur = ms => { const s = Math.round(ms / 1000); return s < 90 ? s + 's' : s < 5400 ? Math.round(s / 60) + ' min' : (s / 3600).toFixed(1) + ' h'; };
+function huntItems(u){
+  const out = [];
+  for (const rec of Object.values(huntStore(u).g)) if (rec) for (const [ply, san, fen, uci] of rec.b) out.push({ply, san, fen, uci, opp: rec.o, r: rec.r, d: rec.d, t: rec.t, c: rec.c, url: rec.u});
+  return out.sort((a, b) => b.d - a.d);
+}
+function countHunt(u){ let n = 0; for (const rec of Object.values(huntStore(u).g)) if (rec) n += rec.b.length; return n; }
+let huntShow = 48;
 function renderHunt(){
-  if (!huntRes) return;
-  const gs = huntRes.games, tot = {}; for (const k of ORDER) tot[k] = gs.reduce((a, G) => a + countOf(G, G.meta.userColor, k), 0);
-  const accs = gs.map(G => accuracy(G, G.meta.userColor)).filter(a => a != null);
-  const avg = accs.length ? accs.reduce((a, b) => a + b, 0) / accs.length : null;
-  const bestG = gs.slice().sort((a, b) => (accuracy(b, b.meta.userColor) || 0) - (accuracy(a, a.meta.userColor) || 0))[0];
-  const items = []; gs.forEach((G, gi) => G.moves.forEach((m, i) => { if (m.color === G.meta.userColor && (m.cls === 'brilliant' || m.cls === 'great')) items.push({gi, i, m, G}); }));
-  items.sort((a, b) => (a.m.cls === 'brilliant' ? 0 : 1) - (b.m.cls === 'brilliant' ? 0 : 1));
+  if (!S.user) return;
+  const u = S.user, d = huntStore(u), scannedAll = Object.keys(d.g).length, items = huntItems(u);
+  if (!scannedAll && !S.hunting) { $('#hunt-out').innerHTML = ''; return; }
+  const per = items.length ? Math.round(scannedAll / items.length) : null;
+  const byYear = {}; for (const it of items) { const y = new Date(it.d * 1000).getFullYear(); byYear[y] = (byYear[y] || 0) + 1; }
   $('#hunt-out').innerHTML = `
-    <div class="card"><h4>Your totals across ${gs.length} game${gs.length === 1 ? '' : 's'}${gs.length < huntRes.n ? ` (of ${huntRes.n})` : ''}</h4>
-      <div class="row" style="gap:18px;margin-bottom:6px"><div><div class="big">${avg == null ? '—' : avg.toFixed(1)}</div><div class="dim" style="font-size:12px">AVG ACCURACY</div></div>
-      ${bestG ? `<div><div class="big" style="font-size:22px">${(accuracy(bestG, bestG.meta.userColor) || 0).toFixed(1)}%</div><div class="dim" style="font-size:12px">BEST GAME · vs ${esc(bestG.meta.userColor === 'w' ? bestG.meta.black : bestG.meta.white)}</div></div>` : ''}</div>
-      <div class="row" style="margin-top:12px">${ORDER.map(k => `<span class="pill" style="${tot[k] ? '' : 'opacity:.45'}">${clsIcon(k, 18)} ${CLS[k].label} <b style="color:var(--text)">${tot[k]}</b></span>`).join('')}</div></div>
-    <div class="card"><h4>${clsIcon('brilliant', 18)} Brilliant &amp; great moves</h4>
-      ${items.length ? `<div class="bril-grid">${items.slice(0, 24).map((x, k) => `<div class="bril" data-k="${k}"><div class="mini"></div><div class="t">${clsIcon(x.m.cls, 18)} ${Math.floor(x.i / 2) + 1}${x.m.color === 'w' ? '.' : '...'} ${esc(x.m.san)}</div><div class="s">vs ${esc(x.G.meta.userColor === 'w' ? x.G.meta.black : x.G.meta.white)} · ${CLS[x.m.cls].label}</div></div>`).join('')}</div>`
-        : '<div class="muted">No brilliant or great moves found yet. Keep hunting — try scanning more games!</div>'}</div>`;
-  items.slice(0, 24).forEach((x, k) => {
-    const el = $(`.bril[data-k="${k}"] .mini`), b = new Board(el, {coords: false, flipped: x.G.meta.userColor === 'b'});
-    b.set({fen: x.G.positions[x.i + 1].fen, last: x.m, hl: CLS[x.m.cls].c, badge: {sq: x.m.to, cls: x.m.cls}});
-    el.closest('.bril').onclick = () => openReview(x.G, {ply: x.i + 1});
+    <div class="card"><div class="cr-stats">
+      <div><b class="num">${scannedAll.toLocaleString()}</b><small>games scanned</small></div>
+      <div><b class="num" style="color:#1bada6">${items.length}</b><small>brilliant moves</small></div>
+      <div><b class="num">${per ? '1 in ' + per : '—'}</b><small>games has a brilliant</small></div>
+      <div><b class="num">${Object.keys(byYear).length ? Object.entries(byYear).sort((a, b) => b[1] - a[1])[0][0] : '—'}</b><small>best year</small></div></div>
+      ${!S.hunting && scannedAll ? `<div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn sm ghost" id="b-hunt-clear">Clear saved scan</button></div>` : ''}</div>
+    <div class="card"><h4>${clsIcon('brilliant', 18)} Your brilliant moves<span class="sub">newest first · click to replay</span></h4>
+      ${items.length ? `<div class="bril-grid">${items.slice(0, huntShow).map((x, k) => `<div class="bril" data-k="${k}"><div class="mini"></div><div class="t">${clsIcon('brilliant', 18)} ${Math.floor((x.ply - 1) / 2) + 1}${x.c === 'w' ? '.' : '...'} ${esc(x.san)}</div><div class="s">vs ${esc(x.opp)} (${x.r}) · ${esc(x.t)} · ${new Date(x.d * 1000).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})}</div></div>`).join('')}</div>
+        ${items.length > huntShow ? `<div style="text-align:center;margin-top:14px"><button class="btn" id="b-hunt-more">Show more (${items.length - huntShow} left)</button></div>` : ''}`
+        : `<div class="muted" style="font-size:14px">${S.hunting ? 'Hunting… brilliants will appear here as soon as they are found.' : 'No brilliant moves in the scanned games yet. Brilliants are rare (most players find one every few hundred games), so try scanning more of your history.'}</div>`}</div>`;
+  items.slice(0, huntShow).forEach((x, k) => {
+    const el = $(`.bril[data-k="${k}"] .mini`), b = new Board(el, {coords: false, flipped: x.c === 'b'});
+    b.set({fen: x.fen, last: {from: x.uci.slice(0, 2), to: x.uci.slice(2, 4)}, hl: CLS.brilliant.c, badge: {sq: x.uci.slice(2, 4), cls: 'brilliant'}});
+    el.closest('.bril').onclick = () => openHuntItem(x);
   });
+  const more = $('#b-hunt-more'); if (more) more.onclick = () => { huntShow += 48; renderHunt(); };
+  const clr = $('#b-hunt-clear'); if (clr) clr.onclick = () => { if (confirm('Clear the saved Brilliant Hunter results for this player? You can scan again any time.')) { store.del('gl2_bh_' + u); huntShow = 48; renderHunt(); renderGames(); } };
 }
+async function openHuntItem(x){
+  const dt = new Date(x.d * 1000), url = `https://api.chess.com/pub/player/${encodeURIComponent(S.user)}/games/${dt.getUTCFullYear()}/${pad2h(dt.getUTCMonth() + 1)}`;
+  let g = null;
+  for (const arch of [url, ...S.archives]) { try { const gs = S.arch[arch] || (await api(arch)).games || []; g = gs.find(z => z.url === x.url); } catch(e) {} if (g) break; if (arch !== url) break; }
+  if (!g) { toast("Couldn't load that game from Chess.com"); return; }
+  let G; try { G = buildGame(g.pgn, metaFromGame(g)); } catch(e) { toast(e.message); return; }
+  openReview(G, {ply: x.ply});
+}
+const pad2h = n => String(n).padStart(2, '0');
 
 /* ============================================================
    Review

@@ -18,7 +18,11 @@ function whyBoxHTML(G, i){
     for (let k = 0; k < Math.min(pv.length, 4); k++) { const r = c.move(mvObj(pv[k])); if (!r) break; if (r.color !== m.color && r.captured) { lost = r.captured; break; } }
     body = `${lost ? `<b>${esc(m.san)}</b> offers your <b>${PNAME[lost]}</b>.` : `<b>${esc(m.san)}</b> gives up material on purpose.`} Normally that would lose, but here it works`;
     if (L1 && L1.type === 'mate' && L1.v < 0) body += `: it leads to a <b>forced checkmate in ${-L1.v}</b>.`;
-    else if (reply.length) body += `: after ${opp}'s best reply <b>${esc(reply[0])}</b>, the follow-up <b>${esc(reply.slice(1, 5).join(' '))}</b> leaves ${who} clearly better (${esc(fmtScore(L1, after.turn))}).`;
+    else if (reply.length) {
+      const mw = m.color === 'w' ? after.wW : 100 - after.wW;
+      const how = mw >= 70 ? `leaves ${who} clearly better` : mw >= 57 ? `leaves ${who} better` : `keeps the position balanced for ${who}`;
+      body += `: after ${opp}'s best reply <b>${esc(reply[0])}</b>, the follow-up <b>${esc(reply.slice(1, 5).join(' '))}</b> ${how} (${esc(fmtScore(L1, after.turn))}).`;
+    }
     else body += ` and ${who} stays on top.`;
     const gm = G.moves[i + 1];
     if (gm && pv[0] && gm.uci !== pv[0]) body += ` In the game, ${opp} played <b>${esc(gm.san)}</b> instead.`;
@@ -97,7 +101,7 @@ async function latestGamesFor(u){
 }
 function gameMetaFor(g, u){
   const c = g.white.username.toLowerCase() === u ? 'w' : 'b';
-  return {white: g.white.username, black: g.black.username, wElo: g.white.rating, bElo: g.black.rating, userColor: c, url: g.url, timeClass: g.time_class, fromApi: true};
+  return {white: g.white.username, black: g.black.username, wElo: g.white.rating, bElo: g.black.rating, userColor: c, url: g.url, timeClass: g.time_class, fromApi: true, end: g.end_time, user: u};
 }
 function resultFor(g, u){ const me = g.white.username.toLowerCase() === u ? g.white : g.black; return me.result === 'win' ? 'W' : DRAWS.has(me.result) ? 'D' : 'L'; }
 async function checkNewGames(){

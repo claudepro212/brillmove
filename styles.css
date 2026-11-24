@@ -453,3 +453,41 @@ footer .logo .mk{width:26px;height:26px;border-radius:7px}.footer .logo .mk img{
 .sg-n .ttl{font-size:10.5px;padding:1px 5px}
 .sg-s{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sg .pill{margin-left:auto}
+
+/* ---------- dark mode ---------- */
+[data-theme=dark]{
+  --bg:#0b1220; --surface:#111a2b; --surface2:#162238; --surface3:#1d2b45;
+  --line:#22314d; --line2:#2d3f60;
+  --text:#e6edf7; --muted:#9fb0c8; --dim:#6f819e;
+  --blue:#3b82f6; --blue-d:#93c5fd; --blue-l:#14264a; --blue-m:#1f3b6e;
+  --win:#22c55e; --loss:#f87171; --draw:#94a3b8;
+  --sh1:0 1px 2px rgba(0,0,0,.3); --sh2:0 1px 3px rgba(0,0,0,.35); --sh3:0 12px 32px -8px rgba(0,0,0,.6),0 4px 10px -4px rgba(0,0,0,.4);
+  color-scheme:dark;
+}
+[data-theme=dark] header{background:rgba(11,18,32,.9)}
+[data-theme=dark] .btn.pri{color:#fff}
+[data-theme=dark] .navi .nb.main{color:#fff}
+[data-theme=dark] .toast{background:#e6edf7;color:#0b1220}
+[data-theme=dark] .pill.green{background:#0f2e1d;border-color:#1c5235;color:#6ee7a0}
+[data-theme=dark] .res.W{background:#0f2e1d}[data-theme=dark] .res.L{background:#3a1416}
+[data-theme=dark] .better.ok{background:#0f2a1c;border-color:#1c5235}[data-theme=dark] .better.ok .hd{color:#6ee7a0}
+[data-theme=dark] .why-box.brilliant{background:#0c2b2a;border-color:#1b5f5b}[data-theme=dark] .why-box.brilliant .hd{color:#5eead4}
+[data-theme=dark] .why-box.great{background:#13233a;border-color:#29466e}[data-theme=dark] .why-box.great .hd{color:#9cc3ea}
+[data-theme=dark] .hunt-hero .ic{background:#0c2b2a}
+[data-theme=dark] .accn.b{background:#e6edf7;color:#0b1220}
+[data-theme=dark] .accn.w{background:#fff;color:#0b1220;border-color:#fff}
+[data-theme=dark] .cdot.b{border-color:#94a3b8}
+[data-theme=dark] .ttl{background:#dc2626}
+[data-theme=dark] .cta-band{background:#1d4ed8}
+[data-theme=dark] .step::before{background:var(--blue)}
+[data-theme=dark] .modal{background:rgba(0,0,0,.6)}
+[data-theme=dark] .clk.live{background:#e6edf7;color:#0b1220;border-color:#e6edf7}
+[data-theme=dark] .gc .pill[title^=Brilliant]{background:#0c2b2a!important;border-color:#1b5f5b!important;color:#5eead4!important}
+[data-theme=dark] select.in option{background:var(--surface)}
+.b-install .t{margin-left:2px}
+@media (max-width:640px){ header .b-install .t{display:none} }
+
+/* player tabs scroll sideways on small screens instead of widening the page */
+.tabs{overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tabs .tab{white-space:nowrap;flex:none}
+.sidetabs .tab{flex:1}

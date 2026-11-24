@@ -10,51 +10,51 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=4">
+<link rel="stylesheet" href="styles.css?v=7">
 <script src="vendor/chess.min.js"></script>
 </head>
 <body>
 <!-- icon sprite (Lucide-style line icons) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-first" viewBox="0 0 24 24"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/></symbol>
-  <symbol id="i-prev" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
-  <symbol id="i-next" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
-  <symbol id="i-last" viewBox="0 0 24 24"><path d="m6 17 5-5-5-5M13 17l5-5-5-5"/></symbol>
-  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></symbol>
-  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="i-flip" viewBox="0 0 24 24"><path d="m21 16-4 4-4-4M17 20V4M3 8l4-4 4 4M7 4v16"/></symbol>
-  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5A5.9 5.9 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5M9 18h6M10 22h4"/></symbol>
-  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></symbol>
-  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol>
-  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
-  <symbol id="i-vol" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></symbol>
-  <symbol id="i-mute" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4zM22 9l-6 6M16 9l6 6"/></symbol>
-  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></symbol>
-  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
-  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M4 16V5a1 1 0 0 1 1-1h11"/></symbol>
-  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
-  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18M18 17V9M13 17V5M8 17v-3"/></symbol>
-  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
-  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
-  <symbol id="i-trend" viewBox="0 0 24 24"><path d="M22 7 13.5 15.5l-5-5L2 17M16 7h6v6"/></symbol>
-  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
-  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6M21 17a9 9 0 0 0-15-6.7L3 13"/></symbol>
-  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
-  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
-  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.7V17c0 .6-.5 1-1 1.2C7.9 18.8 7 20.2 7 22M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8M18 2H6v7a6 6 0 0 0 12 0z"/></symbol>
-  <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
-  <symbol id="i-checkc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></symbol>
-  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
-  <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></symbol>
-  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
-  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
-  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
-  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 9h6v6H9zM9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></symbol>
-  <symbol id="i-swords" viewBox="0 0 24 24"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2M9.5 6.5 14 2h3v3l-4.5 4.5M5 14l-2 2 4 4 2-2"/></symbol>
-  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/></symbol>
-  <symbol id="i-palette" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="1"/><circle cx="17.5" cy="10.5" r="1"/><circle cx="8.5" cy="7.5" r="1"/><circle cx="6.5" cy="12.5" r="1"/><path d="M12 2a10 10 0 0 0 0 20c.9 0 1.6-.7 1.6-1.7 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.9.7-1.7 1.7-1.7h2A5.5 5.5 0 0 0 22 11c0-5-4.5-9-10-9z"/></symbol>
-  <symbol id="i-rook" viewBox="0 0 24 24"><path d="M5 21h14M7 21v-3h10v3M8 18l1-8h6l1 8M7 10h10V4h-2.5v2h-2V4h-1v2h-2V4H7z"/></symbol>
+  <symbol id="ico-first" viewBox="0 0 24 24"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/></symbol>
+  <symbol id="ico-prev" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="ico-next" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="ico-last" viewBox="0 0 24 24"><path d="m6 17 5-5-5-5M13 17l5-5-5-5"/></symbol>
+  <symbol id="ico-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></symbol>
+  <symbol id="ico-pause" viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="ico-flip" viewBox="0 0 24 24"><path d="m21 16-4 4-4-4M17 20V4M3 8l4-4 4 4M7 4v16"/></symbol>
+  <symbol id="ico-bulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5A5.9 5.9 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5M9 18h6M10 22h4"/></symbol>
+  <symbol id="ico-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></symbol>
+  <symbol id="ico-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol>
+  <symbol id="ico-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="ico-vol" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></symbol>
+  <symbol id="ico-mute" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4zM22 9l-6 6M16 9l6 6"/></symbol>
+  <symbol id="ico-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></symbol>
+  <symbol id="ico-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="ico-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M4 16V5a1 1 0 0 1 1-1h11"/></symbol>
+  <symbol id="ico-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="ico-chart" viewBox="0 0 24 24"><path d="M3 3v18h18M18 17V9M13 17V5M8 17v-3"/></symbol>
+  <symbol id="ico-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="ico-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="ico-trend" viewBox="0 0 24 24"><path d="M22 7 13.5 15.5l-5-5L2 17M16 7h6v6"/></symbol>
+  <symbol id="ico-back" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+  <symbol id="ico-undo" viewBox="0 0 24 24"><path d="M3 7v6h6M21 17a9 9 0 0 0-15-6.7L3 13"/></symbol>
+  <symbol id="ico-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="ico-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+  <symbol id="ico-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.7V17c0 .6-.5 1-1 1.2C7.9 18.8 7 20.2 7 22M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8M18 2H6v7a6 6 0 0 0 12 0z"/></symbol>
+  <symbol id="ico-spark" viewBox="0 0 24 24"><path d="m12 3 1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
+  <symbol id="ico-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="ico-checkc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="ico-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="ico-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></symbol>
+  <symbol id="ico-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+  <symbol id="ico-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="ico-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+  <symbol id="ico-cpu" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 9h6v6H9zM9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></symbol>
+  <symbol id="ico-swords" viewBox="0 0 24 24"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2M9.5 6.5 14 2h3v3l-4.5 4.5M5 14l-2 2 4 4 2-2"/></symbol>
+  <symbol id="ico-heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/></symbol>
+  <symbol id="ico-palette" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="1"/><circle cx="17.5" cy="10.5" r="1"/><circle cx="8.5" cy="7.5" r="1"/><circle cx="6.5" cy="12.5" r="1"/><path d="M12 2a10 10 0 0 0 0 20c.9 0 1.6-.7 1.6-1.7 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.9.7-1.7 1.7-1.7h2A5.5 5.5 0 0 0 22 11c0-5-4.5-9-10-9z"/></symbol>
+  <symbol id="ico-rook" viewBox="0 0 24 24"><path d="M5 21h14M7 21v-3h10v3M8 18l1-8h6l1 8M7 10h10V4h-2.5v2h-2V4h-1v2h-2V4H7z"/></symbol>
 </svg>
 
 <canvas id="confetti"></canvas>
@@ -71,8 +71,8 @@
   <div class="sp"></div>
   <button class="btn sm ghost hidden" id="me-chip" title="Your linked account"></button>
   <button class="ibtn" id="b-sound" title="Sound on/off" aria-label="Sound on/off"></button>
-  <button class="ibtn" id="b-settings" title="Settings" aria-label="Settings"><svg class="i"><use href="#i-sliders"/></svg></button>
-  <button class="ibtn" id="b-gallery" title="Saved moments" aria-label="Saved moments"><svg class="i"><use href="#i-bookmark"/></svg><span class="cnt hidden" id="saved-n">0</span></button>
+  <button class="ibtn" id="b-settings" title="Settings" aria-label="Settings"><svg class="i"><use href="#ico-sliders"/></svg></button>
+  <button class="ibtn" id="b-gallery" title="Saved moments" aria-label="Saved moments"><svg class="i"><use href="#ico-bookmark"/></svg><span class="cnt hidden" id="saved-n">0</span></button>
 </header>
 
 <main>
@@ -80,19 +80,19 @@
 <section id="v-home">
   <div class="hero">
     <div>
-      <span class="eyebrow"><svg class="i sm"><use href="#i-cpu"/></svg> Powered by Stockfish 17</span>
+      <span class="eyebrow"><svg class="i sm"><use href="#ico-cpu"/></svg> Powered by Stockfish 17</span>
       <h1>Review every chess game. <em>Free.</em></h1>
       <p class="lead">Enter your Chess.com username, pick a game, and replay it move by move. See your brilliant moves and blunders, and learn exactly what you could have played instead.</p>
-      <form class="search" id="f-user">
-        <span class="at"><svg class="i"><use href="#i-search"/></svg></span>
-        <input id="i-user" placeholder="Chess.com username" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Chess.com username">
+      <div class="sbox"><form class="search" id="f-user">
+        <span class="at"><svg class="i"><use href="#ico-search"/></svg></span>
+        <input id="i-user" placeholder="Search any Chess.com username" autocomplete="off" role="combobox" aria-controls="u-suggest" autocapitalize="off" spellcheck="false" aria-label="Chess.com username">
         <button class="btn pri" type="submit">Find my games</button>
-      </form>
+      </form><div class="suggest hidden" id="u-suggest" role="listbox"></div></div>
       <div class="err" id="home-err"></div>
       <div class="trust">
-        <span><svg class="i sm"><use href="#i-check"/></svg>Unlimited reviews</span>
-        <span><svg class="i sm"><use href="#i-check"/></svg>No sign-up</span>
-        <span><svg class="i sm"><use href="#i-check"/></svg>Runs in your browser</span>
+        <span><svg class="i sm"><use href="#ico-check"/></svg>Unlimited reviews</span>
+        <span><svg class="i sm"><use href="#ico-check"/></svg>No sign-up</span>
+        <span><svg class="i sm"><use href="#ico-check"/></svg>Runs in your browser</span>
       </div>
       <div id="home-linked" style="max-width:540px;margin-top:16px"></div>
       <div class="recent" id="recent"></div>
@@ -123,17 +123,17 @@
     <p class="sec-s">All features are free. No daily limits.</p>
     <div class="feats">
       <div class="feat"><div class="ic" id="fi-bril"></div><h3>Every move rated</h3><p>Brilliant, Great, Best, Excellent, Good, Book, Inaccuracy, Mistake, Miss and Blunder, counted for both players.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#i-bulb"/></svg></div><h3>What you could have played</h3><p>For every slip, see the better move, why it was better, and the full engine line. Play it out on the board.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#i-next"/></svg></div><h3>Move-by-move replay</h3><p>Big forward and back controls, keyboard arrows, autoplay, and a jump straight to the key moments.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#i-target"/></svg></div><h3>Accuracy &amp; game rating</h3><p>Accuracy for each player, an estimated performance rating, and accuracy by opening, middlegame and endgame.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#i-msg"/></svg></div><h3>Six free coaches</h3><p>Pick a coach whose style you like. They comment on each move and can read their advice out loud.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#i-spark"/></svg></div><h3>Brilliant Hunter</h3><p>Scan your last 5, 10 or 20 games at once and collect every brilliant and great move you've played.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#i-undo"/></svg></div><h3>Retry your mistakes</h3><p>Your own mistakes become puzzles. Find the move you missed, with a hint if you need one.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#i-trend"/></svg></div><h3>Player insights</h3><p>Rating trend, best openings as White and Black, longest streak, best win and how your games end.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#i-chart"/></svg></div><h3>Coach report</h3><p>Your coach reads your last 10–30 games and tells you your weakest points, your strengths, your style and what to practice.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#i-swords"/></svg></div><h3>Play the coach</h3><p>Practice against 7 strength levels. Your coach comments on every move and profiles your playing style live.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#i-user"/></svg></div><h3>Link your account</h3><p>Link your Chess.com username once. Next time you visit after a game, your coach offers to review it with you.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#i-image"/></svg></div><h3>Share cards</h3><p>Turn a great move or a full game summary into a clean image you can download or copy.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-bulb"/></svg></div><h3>What you could have played</h3><p>For every slip, see the better move, why it was better, and the full engine line. Play it out on the board.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-next"/></svg></div><h3>Move-by-move replay</h3><p>Big forward and back controls, keyboard arrows, autoplay, and a jump straight to the key moments.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-target"/></svg></div><h3>Accuracy &amp; game rating</h3><p>Accuracy for each player, an estimated performance rating, and accuracy by opening, middlegame and endgame.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-msg"/></svg></div><h3>Six free coaches</h3><p>Pick a coach whose style you like. They comment on each move and can read their advice out loud.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-spark"/></svg></div><h3>Brilliant Hunter</h3><p>Scan your last 5, 10 or 20 games at once and collect every brilliant and great move you've played.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-undo"/></svg></div><h3>Retry your mistakes</h3><p>Your own mistakes become puzzles. Find the move you missed, with a hint if you need one.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-trend"/></svg></div><h3>Player insights</h3><p>Rating trend, best openings as White and Black, longest streak, best win and how your games end.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-chart"/></svg></div><h3>Coach report</h3><p>Your coach reads your last 10–30 games and tells you your weakest points, your strengths, your style and what to practice.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-swords"/></svg></div><h3>Play the coach</h3><p>Practice against 7 strength levels. Your coach comments on every move and profiles your playing style live.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-user"/></svg></div><h3>Link your account</h3><p>Link your Chess.com username once. Next time you visit after a game, your coach offers to review it with you.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-image"/></svg></div><h3>Share cards</h3><p>Turn a great move or a full game summary into a clean image you can download or copy.</p></div>
     </div>
   </div>
 
@@ -153,9 +153,9 @@
 <section id="v-player" class="hidden">
   <div class="card prof" id="prof"></div>
   <div class="tabs" id="ptabs">
-    <button class="tab on" data-pt="games"><svg class="i sm"><use href="#i-list"/></svg>Games</button>
-    <button class="tab" data-pt="insights"><svg class="i sm"><use href="#i-trend"/></svg>Insights</button>
-    <button class="tab" data-pt="coach"><svg class="i sm"><use href="#i-target"/></svg>Coach report</button>
+    <button class="tab on" data-pt="games"><svg class="i sm"><use href="#ico-list"/></svg>Games</button>
+    <button class="tab" data-pt="insights"><svg class="i sm"><use href="#ico-trend"/></svg>Insights</button>
+    <button class="tab" data-pt="coach"><svg class="i sm"><use href="#ico-target"/></svg>Coach report</button>
     <button class="tab" data-pt="hunt"><span id="hunt-ic"></span>Brilliant Hunter</button>
   </div>
 
@@ -203,29 +203,29 @@
       <div class="navi">
         <div class="now" id="nav-now"></div>
         <div class="btns">
-          <button class="nb" id="c-first" title="First move (Home)" aria-label="First move"><svg class="i"><use href="#i-first"/></svg></button>
-          <button class="nb prevb" id="c-prev" title="Previous move (←)"><svg class="i"><use href="#i-prev"/></svg><span class="t">Previous</span></button>
+          <button class="nb" id="c-first" title="First move (Home)" aria-label="First move"><svg class="i"><use href="#ico-first"/></svg></button>
+          <button class="nb prevb" id="c-prev" title="Previous move (←)"><svg class="i"><use href="#ico-prev"/></svg><span class="t">Previous</span></button>
           <button class="nb" id="c-play" title="Autoplay (Space)" aria-label="Autoplay"></button>
-          <button class="nb main" id="c-next" title="Next move (→)"><span class="t">Next move</span><svg class="i"><use href="#i-next"/></svg></button>
-          <button class="nb" id="c-last" title="Last move (End)" aria-label="Last move"><svg class="i"><use href="#i-last"/></svg></button>
+          <button class="nb main" id="c-next" title="Next move (→)"><span class="t">Next move</span><svg class="i"><use href="#ico-next"/></svg></button>
+          <button class="nb" id="c-last" title="Last move (End)" aria-label="Last move"><svg class="i"><use href="#ico-last"/></svg></button>
         </div>
         <div class="tools">
-          <button class="btn sm ghost" id="c-key" title="Next key moment (K)"><svg class="i sm"><use href="#i-flag"/></svg><span class="t">Key moment</span></button>
-          <button class="btn sm ghost" id="c-hint" title="Show the engine's best move here (H)"><svg class="i sm"><use href="#i-bulb"/></svg><span class="t">Engine hint</span></button>
-          <button class="btn sm ghost" id="c-flip" title="Flip board (F)"><svg class="i sm"><use href="#i-flip"/></svg><span class="t">Flip</span></button>
+          <button class="btn sm ghost" id="c-key" title="Next key moment (K)"><svg class="i sm"><use href="#ico-flag"/></svg><span class="t">Key moment</span></button>
+          <button class="btn sm ghost" id="c-hint" title="Show the engine's best move here (H)"><svg class="i sm"><use href="#ico-bulb"/></svg><span class="t">Engine hint</span></button>
+          <button class="btn sm ghost" id="c-flip" title="Flip board (F)"><svg class="i sm"><use href="#ico-flip"/></svg><span class="t">Flip</span></button>
         </div>
       </div>
     </div>
 
     <div class="side">
       <div class="card" id="an-card">
-        <div class="row"><div class="spin" id="an-spin"></div><b id="an-t" style="font-size:14px">Analyzing your game…</b><span class="pill" id="an-pill"></span><div style="flex:1"></div><button class="btn sm ghost" id="b-back"><svg class="i sm"><use href="#i-back"/></svg>Back</button></div>
+        <div class="row"><div class="spin" id="an-spin"></div><b id="an-t" style="font-size:14px">Analyzing your game…</b><span class="pill" id="an-pill"></span><div style="flex:1"></div><button class="btn sm ghost" id="b-back"><svg class="i sm"><use href="#ico-back"/></svg>Back</button></div>
         <div class="prog" id="an-prog"><div></div></div>
       </div>
 
       <div class="sidetabs">
-        <button class="tab on" data-st="report"><svg class="i sm"><use href="#i-chart"/></svg>Game report</button>
-        <button class="tab" data-st="moves"><svg class="i sm"><use href="#i-list"/></svg>Move by move</button>
+        <button class="tab on" data-st="report"><svg class="i sm"><use href="#ico-chart"/></svg>Game report</button>
+        <button class="tab" data-st="moves"><svg class="i sm"><use href="#ico-list"/></svg>Move by move</button>
       </div>
 
       <!-- report -->
@@ -234,14 +234,14 @@
           <div class="pl2" id="rep-players"></div>
           <table class="cnt" id="rep-counts"></table>
           <div class="est" id="rep-est"></div>
-          <button class="btn pri lg big-cta" id="b-start" style="margin-top:16px"><svg class="i"><use href="#i-play"/></svg>Start move-by-move review</button>
+          <button class="btn pri lg big-cta" id="b-start" style="margin-top:16px"><svg class="i"><use href="#ico-play"/></svg>Start move-by-move review</button>
         </div>
-        <div class="card"><h4><svg class="i sm"><use href="#i-bulb"/></svg>What could have been better<span class="sub" id="rep-imp-who"></span></h4><div class="imp" id="rep-imp"><span class="dim" style="font-size:14px">Appears when the analysis finishes.</span></div></div>
-        <div class="card"><h4><svg class="i sm"><use href="#i-trend"/></svg>Evaluation</h4><canvas id="graph"></canvas></div>
-        <div class="card"><h4><svg class="i sm"><use href="#i-target"/></svg>Accuracy by phase</h4><table class="ph" id="rep-phase"></table></div>
-        <div class="card"><h4><svg class="i sm"><use href="#i-flag"/></svg>Key moments</h4><div class="keys" id="rep-keys"><span class="dim" style="font-size:14px">Appears when the analysis finishes.</span></div></div>
-        <div class="card"><h4><svg class="i sm"><use href="#i-trophy"/></svg>Achievements</h4><div class="achs" id="rep-ach"><span class="dim" style="font-size:14px">Unlocks when the analysis finishes.</span></div></div>
-        <div class="card"><div class="row"><button class="btn" id="b-sumcard"><svg class="i sm"><use href="#i-image"/></svg>Summary card</button><button class="btn" id="b-retry1"><svg class="i sm"><use href="#i-undo"/></svg>Retry my mistakes</button><button class="btn" id="b-pgnc"><svg class="i sm"><use href="#i-copy"/></svg>Copy PGN</button></div></div>
+        <div class="card"><h4><svg class="i sm"><use href="#ico-bulb"/></svg>What could have been better<span class="sub" id="rep-imp-who"></span></h4><div class="imp" id="rep-imp"><span class="dim" style="font-size:14px">Appears when the analysis finishes.</span></div></div>
+        <div class="card"><h4><svg class="i sm"><use href="#ico-trend"/></svg>Evaluation</h4><canvas id="graph"></canvas></div>
+        <div class="card"><h4><svg class="i sm"><use href="#ico-target"/></svg>Accuracy by phase</h4><table class="ph" id="rep-phase"></table></div>
+        <div class="card"><h4><svg class="i sm"><use href="#ico-flag"/></svg>Key moments</h4><div class="keys" id="rep-keys"><span class="dim" style="font-size:14px">Appears when the analysis finishes.</span></div></div>
+        <div class="card"><h4><svg class="i sm"><use href="#ico-trophy"/></svg>Achievements</h4><div class="achs" id="rep-ach"><span class="dim" style="font-size:14px">Unlocks when the analysis finishes.</span></div></div>
+        <div class="card"><div class="row"><button class="btn" id="b-sumcard"><svg class="i sm"><use href="#ico-image"/></svg>Summary card</button><button class="btn" id="b-retry1"><svg class="i sm"><use href="#ico-undo"/></svg>Retry my mistakes</button><button class="btn" id="b-pgnc"><svg class="i sm"><use href="#ico-copy"/></svg>Copy PGN</button></div></div>
       </div>
 
       <!-- moves -->
@@ -252,7 +252,7 @@
           <div class="coach">
             <div id="co-ic"></div>
             <div style="min-width:0;flex:1">
-              <div class="row" style="justify-content:space-between;flex-wrap:nowrap"><span class="cname" id="co-name"></span><span class="row" style="gap:2px;flex-wrap:nowrap"><button class="btn sm ghost" id="b-speak" title="Hear your coach"><svg class="i sm"><use href="#i-vol"/></svg></button><button class="btn sm ghost" id="b-coach" title="Pick a different coach">Change coach</button></span></div>
+              <div class="row" style="justify-content:space-between;flex-wrap:nowrap"><span class="cname" id="co-name"></span><span class="row" style="gap:2px;flex-wrap:nowrap"><button class="btn sm ghost" id="b-speak" title="Hear your coach"><svg class="i sm"><use href="#ico-vol"/></svg></button><button class="btn sm ghost" id="b-coach" title="Pick a different coach">Change coach</button></span></div>
               <div class="say" id="co-say"></div>
               <div class="t1" id="co-t1"></div><div class="t2" id="co-t2"></div>
             </div>
@@ -261,14 +261,14 @@
           <div class="wc hidden" id="co-wc"></div>
           <div class="bline hidden" id="co-line"></div>
           <div class="acts">
-            <button class="btn sm soft" id="b-showbest"><svg class="i sm"><use href="#i-play"/></svg>Play the better line</button>
-            <button class="btn sm" id="b-share"><svg class="i sm"><use href="#i-image"/></svg>Share this move</button>
-            <button class="btn sm" id="b-retry2"><svg class="i sm"><use href="#i-undo"/></svg>Retry mistakes</button>
+            <button class="btn sm soft" id="b-showbest"><svg class="i sm"><use href="#ico-play"/></svg>Play the better line</button>
+            <button class="btn sm" id="b-share"><svg class="i sm"><use href="#ico-image"/></svg>Share this move</button>
+            <button class="btn sm" id="b-retry2"><svg class="i sm"><use href="#ico-undo"/></svg>Retry mistakes</button>
           </div>
           <div class="dim" style="font-size:12.5px;margin-top:12px">Tip: drag any piece to try your own idea. Use <span class="kbd">←</span> <span class="kbd">→</span> to move through the game.</div>
         </div>
         <div class="card"><canvas id="graph2"></canvas></div>
-        <div class="card"><h4><svg class="i sm"><use href="#i-list"/></svg>Moves</h4><div class="mvs" id="mvs"></div></div>
+        <div class="card"><h4><svg class="i sm"><use href="#ico-list"/></svg>Moves</h4><div class="mvs" id="mvs"></div></div>
       </div>
     </div>
   </div>
@@ -305,7 +305,7 @@
 
 <div class="modal hidden" id="modal"><div class="mbox" id="mbox"></div></div>
 <script src="fx.js?v=4"></script>
-<script src="app.js?v=4"></script>
+<script src="app.js?v=7"></script>
 <script src="coach.js?v=5"></script>
 </body>
 </html>

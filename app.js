@@ -9,7 +9,7 @@ const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-const icon = (n, cls = '') => `<svg class="i ${cls}"><use href="#i-${n}"/></svg>`;
+const icon = (n, cls = '') => `<svg class="i ${cls}"><use href="#ico-${n}"/></svg>`;
 const store = {
   get(k, d){ try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e) { return d; } },
   set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e) { return false; } },
@@ -547,30 +547,94 @@ function metaFromGame(g){
   return {white: g.white.username, black: g.black.username, wElo: g.white.rating, bElo: g.black.rating, userColor: S.user ? meOf(g) : null, url: g.url, timeClass: g.time_class, fromApi: true};
 }
 
+let userTok = 0;
 async function loadUser(name){
-  name = (name || '').trim().replace(/^@/, '').toLowerCase();
+  name = (name || '').trim().replace(/^@/, '').replace(/^https?:\/\/(www\.)?chess\.com\/member\//i, '').replace(/\/.*$/, '').toLowerCase();
   if (!name) return;
   if (!/^[a-z0-9_-]{2,30}$/.test(name)) { $('#home-err').textContent = 'That does not look like a Chess.com username.'; return; }
+  const tok = ++userTok;               // only the newest search is allowed to update the page
+  Suggest.close();
   $('#home-err').innerHTML = '<span class="muted">Looking up ' + esc(name) + '…</span>';
+  const btn = $('#f-user .btn'); if (btn) btn.disabled = true;
   try {
     const base = `https://api.chess.com/pub/player/${encodeURIComponent(name)}`;
-    const [prof, arch] = await Promise.all([api(base), api(base + '/games/archives')]);
-    let stats = {}; try { stats = await api(base + '/stats'); } catch(e) {}
-    Object.assign(S, {user: name, prof, stats, archives: (arch.archives || []).slice().reverse(), arch: {}, monthIdx: 0, tc: 'all', res: 'all', q: ''});
+    const [prof, arch, stats] = await Promise.all([api(base), api(base + '/games/archives'), api(base + '/stats').catch(() => ({}))]);
+    if (tok !== userTok) return;
+    S.huntGen++; S.hunting = false; huntRes = null; $('#hunt-out').innerHTML = ''; $('#hunt-prog').classList.add('hidden'); $('#b-hunt').textContent = 'Start scan';
+    if (typeof coachGen !== 'undefined') coachGen++;
+    Object.assign(S, {user: name, prof, stats, archives: (arch.archives || []).slice().reverse(), arch: {}, games: [], monthIdx: 0, tc: 'all', res: 'all', q: ''});
     S.avatars[name] = prof.avatar || '';
-    const rec = store.get('gl2_recent', []).filter(x => x.u !== name); rec.unshift({u: name, n: prof.username, a: prof.avatar || ''}); store.set('gl2_recent', rec.slice(0, 6));
+    const rec = store.get('gl2_recent', []).filter(x => x.u !== name); rec.unshift({u: name, n: prof.username, a: prof.avatar || '', t: prof.title || ''}); store.set('gl2_recent', rec.slice(0, 8));
     if (location.hash !== '#u=' + name) history.replaceState(null, '', '#u=' + encodeURIComponent(name));
-    $('#home-err').textContent = ''; $('#q-opp').value = '';
+    $('#home-err').textContent = ''; $('#q-opp').value = ''; $('#i-user').value = '';
     renderProfile(); renderRecent();
-    $('#nav').classList.remove('hidden');
     $('#month').innerHTML = S.archives.map((u, i) => { const [y, m] = u.split('/').slice(-2); return `<option value="${i}">${new Date(+y, +m - 1).toLocaleString(undefined, {month: 'long', year: 'numeric'})}</option>`; }).join('');
     showPlayer('games');
     if (!S.archives.length) { $('#glist').innerHTML = '<div class="card">This player has no games yet.</div>'; return; }
     await loadMonth(0);
   } catch(e) {
-    $('#home-err').textContent = e.message === 'not found' ? `No Chess.com player named “${name}”. Check the spelling?` : `Couldn't reach Chess.com (${e.message}). Try again in a moment.`;
-  }
+    if (tok !== userTok) return;
+    $('#home-err').textContent = e.message === 'not found' ? `No Chess.com player named “${name}”. Check the spelling, or pick a suggestion.` : `Couldn't reach Chess.com (${e.message}). Try again in a moment.`;
+    if (!$('#v-home').classList.contains('hidden')) return;
+    show('home'); toast(e.message === 'not found' ? `No player named “${name}”` : "Couldn't reach Chess.com");
+  } finally { if (tok === userTok && btn) btn.disabled = false; }
 }
+
+/* ---------------- username suggestions ---------------- */
+const POPULAR = [
+  ['hikaru', 'Hikaru Nakamura', 'GM'], ['magnuscarlsen', 'Magnus Carlsen', 'GM'], ['gothamchess', 'Levy Rozman', 'IM'], ['danielnaroditsky', 'Daniel Naroditsky', 'GM'],
+  ['fabianocaruana', 'Fabiano Caruana', 'GM'], ['firouzja2003', 'Alireza Firouzja', 'GM'], ['lachesisq', 'Ian Nepomniachtchi', 'GM'], ['annacramling', 'Anna Cramling', 'WFM'],
+  ['alexandrabotez', 'Alexandra Botez', 'WFM'], ['botezlive', 'BotezLive', ''], ['chessbrah', 'Eric Hansen', 'GM'], ['wesleyso', 'Wesley So', 'GM'], ['levonaronian', 'Levon Aronian', 'GM'],
+  ['anishgiri', 'Anish Giri', 'GM'], ['gmbenjaminbok', 'Benjamin Bok', 'GM'], ['nihalsarin', 'Nihal Sarin', 'GM'], ['chessnetwork', 'ChessNetwork', 'NM'], ['imrosen', 'Eric Rosen', 'IM'],
+  ['gukeshdommaraju', 'Gukesh D', 'GM'], ['rpragchess', 'Praggnanandhaa R', 'GM'],
+];
+const Suggest = {
+  items: [], sel: -1, tok: 0, timer: 0, live: {},
+  el(){ return $('#u-suggest'); },
+  close(){ const e = this.el(); if (e) e.classList.add('hidden'); this.sel = -1; },
+  build(q){
+    q = q.trim().replace(/^@/, '').toLowerCase();
+    const seen = new Set(), out = [];
+    const add = (u, label, sub, av, kind, title) => { if (!u || seen.has(u)) return; seen.add(u); out.push({u, label, sub, av, kind, title}); };
+    const L = typeof linkedAcc === 'function' ? linkedAcc() : null;
+    const live = q.length >= 3 ? this.live[q] : null;
+    if (live && live.ok) add(live.u, live.name, live.sub, live.av, 'match', live.title);
+    if (L && (!q || L.u.includes(q))) add(L.u, L.name || L.u, 'Your linked account', L.av, 'you');
+    for (const r of store.get('gl2_recent', [])) if (!q || r.u.includes(q) || (r.n || '').toLowerCase().includes(q)) add(r.u, r.n || r.u, 'Recent search', r.a, 'recent', r.t);
+    if (q && S.games.length) {
+      const opps = {}; for (const g of S.games) { const o = meOf(g) === 'w' ? g.black : g.white; const k = o.username.toLowerCase(); if (k.includes(q)) opps[k] = o; }
+      for (const [k, o] of Object.entries(opps).slice(0, 4)) add(k, o.username, `Played ${esc(S.prof ? S.prof.username : '')} · ${o.rating}`, '', 'opp');
+    }
+    for (const [u, n, t] of POPULAR) if (!q || u.includes(q) || n.toLowerCase().includes(q)) add(u, n, '@' + u, '', 'pop', t);
+    if (q && q.length >= 3 && live === undefined) out.unshift({u: q, label: q, sub: 'Checking Chess.com…', kind: 'checking'});
+    if (q && live && !live.ok && !out.length) out.push({u: q, label: q, sub: 'No Chess.com player with this exact username', kind: 'none'});
+    return out.slice(0, 8);
+  },
+  render(){
+    const e = this.el(), q = $('#i-user').value; if (!e) return;
+    this.items = this.build(q);
+    if (!this.items.length) { this.close(); return; }
+    let lastKind = '';
+    const head = k => ({match: 'Chess.com player', you: 'You', recent: 'Recent', opp: 'Opponents', pop: 'Popular players', checking: 'Chess.com player', none: ''})[k] || '';
+    e.innerHTML = this.items.map((it, k) => {
+      const h = head(it.kind), sep = h && h !== lastKind ? `<div class="sg-h">${h}</div>` : ''; lastKind = h || lastKind;
+      const av = it.av ? `<img src="${esc(it.av)}" alt="">` : `<span class="sg-av">${it.kind === 'checking' ? '<span class="spin" style="width:14px;height:14px"></span>' : esc((it.label || '?')[0].toUpperCase())}</span>`;
+      return `${sep}<div class="sg ${k === this.sel ? 'on' : ''} ${it.kind === 'none' || it.kind === 'checking' ? 'dis' : ''}" data-k="${k}">${av}<div style="min-width:0"><div class="sg-n">${it.title ? `<span class="ttl">${esc(it.title)}</span>` : ''}${esc(it.label)}</div><div class="sg-s">${it.sub}</div></div>${it.kind === 'match' ? '<span class="pill green">Found</span>' : ''}</div>`;
+    }).join('');
+    e.classList.remove('hidden');
+  },
+  lookup(q){
+    q = q.trim().replace(/^@/, '').toLowerCase();
+    if (q.length < 3 || !/^[a-z0-9_-]+$/.test(q) || this.live[q] !== undefined) return;
+    clearTimeout(this.timer);
+    this.timer = setTimeout(async () => {
+      try { const p = await api(`https://api.chess.com/pub/player/${encodeURIComponent(q)}`); this.live[q] = {ok: true, u: q, name: p.username || q, title: p.title || '', av: p.avatar || '', sub: [p.name, p.followers ? p.followers.toLocaleString() + ' followers' : ''].filter(Boolean).map(esc).join(' · ') || '@' + esc(q)}; }
+      catch(e) { this.live[q] = {ok: false}; }
+      if ($('#i-user').value.trim().replace(/^@/, '').toLowerCase() === q) this.render();
+    }, 300);
+  },
+  pick(k){ const it = this.items[k]; if (!it || it.kind === 'none' || it.kind === 'checking') return; $('#i-user').value = it.u; this.close(); loadUser(it.u); },
+};
 function flag(url){ const cc = (url || '').split('/').pop(); if (!/^[A-Z]{2}$/.test(cc)) return ''; return String.fromCodePoint(...[...cc].map(c => 127397 + c.charCodeAt(0))); }
 function renderProfile(){
   const p = S.prof, st = S.stats || {};
@@ -584,12 +648,13 @@ function renderProfile(){
     </div>
     <div class="row"><span id="link-slot"></span><button class="btn sm" id="b-chg">Change player</button></div>`;
   renderLinkSlot();
-  $('#b-chg').onclick = () => { show('home'); $('#i-user').focus(); $('#i-user').select(); };
+  $('#b-chg').onclick = () => { show('home'); window.scrollTo(0, 0); $('#i-user').value = ''; $('#i-user').focus(); };
 }
 async function loadMonth(i){
+  const tok = userTok, mt = (S.monthTok = (S.monthTok || 0) + 1);
   S.monthIdx = i; $('#month').value = i;
   $('#glist').innerHTML = '<div class="card"><div class="skel" style="width:60%"></div><div class="skel" style="width:40%;margin-top:10px"></div></div>'.repeat(4);
-  try { S.games = (await fetchArchive(S.archives[i])).slice().sort((a, b) => b.end_time - a.end_time); renderGames(); }
+  try { const gs = (await fetchArchive(S.archives[i])).slice().sort((a, b) => b.end_time - a.end_time); if (tok !== userTok || mt !== S.monthTok) return; S.games = gs; renderGames(); }
   catch(e) { $('#glist').innerHTML = `<div class="card">Couldn't load games: ${esc(e.message)}</div>`; }
 }
 function filteredGames(){
@@ -1458,6 +1523,17 @@ function startPgn(){
 $('#legend').innerHTML = ORDER.map(k => `<span class="pill" style="color:var(--text)">${clsIcon(k, 18)}${CLS[k].label}</span>`).join('');
 $('#fi-bril').innerHTML = clsIcon('brilliant', 30); $('#hunt-ic').innerHTML = clsIcon('brilliant', 18); $('#hunt-big').innerHTML = clsIcon('brilliant', 34);
 $('#f-user').onsubmit = e => { e.preventDefault(); Sound.init && settings.sound && Sound.init(); loadUser($('#i-user').value); };
+$('#i-user').addEventListener('input', () => { $('#home-err').textContent = ''; Suggest.sel = -1; Suggest.lookup($('#i-user').value); Suggest.render(); });
+$('#i-user').addEventListener('focus', () => Suggest.render());
+$('#i-user').addEventListener('keydown', e => {
+  const e2 = Suggest.el(); if (!e2 || e2.classList.contains('hidden')) return;
+  if (e.key === 'ArrowDown') { e.preventDefault(); Suggest.sel = Math.min(Suggest.items.length - 1, Suggest.sel + 1); Suggest.render(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); Suggest.sel = Math.max(-1, Suggest.sel - 1); Suggest.render(); }
+  else if (e.key === 'Enter' && Suggest.sel >= 0) { e.preventDefault(); Suggest.pick(Suggest.sel); }
+  else if (e.key === 'Escape') Suggest.close();
+});
+$('#u-suggest').addEventListener('mousedown', e => { const r = e.target.closest('.sg'); if (r) { e.preventDefault(); Suggest.pick(+r.dataset.k); } });
+document.addEventListener('click', e => { if (!e.target.closest('#f-user') && !e.target.closest('#u-suggest')) Suggest.close(); });
 $('#recent').onclick = e => { const p = e.target.closest('[data-u]'); if (p) { $('#i-user').value = p.dataset.u; loadUser(p.dataset.u); } };
 $('#t-pgn').onclick = () => $('#pgn-box').classList.toggle('hidden');
 $('#b-pgn').onclick = startPgn;
@@ -1531,5 +1607,5 @@ demo.b = new Board($('#demo-board'), {coords: false}); demoStep();
 (() => {
   const m = location.hash.match(/u=([^&]+)/);
   if (m) { const u = decodeURIComponent(m[1]); $('#i-user').value = u; loadUser(u); }
-  else { const r = store.get('gl2_recent', []); if (r[0]) $('#i-user').value = r[0].u; }
+
 })();

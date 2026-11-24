@@ -6,7 +6,7 @@
 
 /* ---------------- coaches (original characters) ---------------- */
 const COACHES = {
-  pawnsworth: {name: 'Professor Pawnsworth', emoji: '🦉', bg: 'linear-gradient(135deg,#7c4dff,#4c2bd1)', tag: 'Patient and wise. Loves a good plan.', voice: {pitch: .9, rate: .95},
+  pawnsworth: {name: 'Professor Pawnsworth', emoji: 'PP', bg: '#2563eb', tag: 'Patient and wise. Loves a good plan.', voice: {pitch: .9, rate: .95},
     start: ['Ah, a fresh game. Let us see what you were thinking.', 'Take a seat. We shall study this one together.'],
     brilliant: ['Magnificent! A sacrifice worthy of the history books.', 'Remarkable. Few players would even consider {san}.'],
     great: ['Precisely the only move. Well calculated.', 'Excellent nerves. Everything else was worse.'],
@@ -19,7 +19,7 @@ const COACHES = {
     miss: ['Your opponent left the door open. We walked past it.', 'There was a gift on the board here.'],
     blunder: ['Oh dear. Let us not dwell — but let us learn.', 'A painful one. Every master has played moves like this.'],
     forced: ['No choice here at all.'], rooksac: ['And the rook is offered! How bold.']},
-  betty: {name: 'Blitz Betty', emoji: '⚡', bg: 'linear-gradient(135deg,#ff3d81,#ff8a00)', tag: 'Hype! Speed! Total chaos!', voice: {pitch: 1.3, rate: 1.15},
+  betty: {name: 'Blitz Betty', emoji: 'BB', bg: '#db2777', tag: 'Hype! Speed! Total chaos!', voice: {pitch: 1.3, rate: 1.15},
     start: ["LET'S GOOO! Show me the madness!", "Buckle up, we're reviewing at full speed!"],
     brilliant: ['NO WAY!! {san}?! THAT IS INSANE!', "BRILLIANT!! I'm literally screaming right now!"],
     great: ['CLUTCH! The ONLY move and you found it!', 'Ice cold. Absolutely ice cold.'],
@@ -32,7 +32,7 @@ const COACHES = {
     miss: ['THEY BLUNDERED AND YOU MISSED IT?!', 'Free stuff was RIGHT THERE!'],
     blunder: ['NOOOOO! What happened?!', 'Chat, he did NOT just play that.'],
     forced: ['Only move — just send it!'], rooksac: ['HE SACRIFICES THE ROOOOOK!']},
-  grizz: {name: 'Coach Grizz', emoji: '🐻', bg: 'linear-gradient(135deg,#a16207,#5b3a06)', tag: 'Tough love. No excuses.', voice: {pitch: .7, rate: .95},
+  grizz: {name: 'Coach Grizz', emoji: 'CG', bg: '#92400e', tag: 'Tough love. No excuses.', voice: {pitch: .7, rate: .95},
     start: ["Alright. Let's see if you were paying attention.", 'Game tape time. No excuses.'],
     brilliant: ["Now THAT'S what I'm talking about. Brilliant.", "Big move. I'm almost proud."],
     great: ['Good. That was the only move. You found it.', "Pressure? Didn't bother you. Good."],
@@ -45,7 +45,7 @@ const COACHES = {
     miss: ['They handed it to you. You dropped it.', 'Punish that. Every time.'],
     blunder: ['Unacceptable. Twenty push-ups.', "What was that? Seriously, what was that?"],
     forced: ['No choice. Move on.'], rooksac: ['Gave up the rook. Gutsy.']},
-  robo: {name: 'R0-B0 Rook', emoji: '🤖', bg: 'linear-gradient(135deg,#00b8d4,#0e7490)', tag: 'Calculates everything. Feels nothing.', voice: {pitch: .4, rate: 1.05},
+  robo: {name: 'R0-B0 Rook', emoji: 'R0', bg: '#0891b2', tag: 'Calculates everything. Feels nothing.', voice: {pitch: .4, rate: 1.05},
     start: ['Booting review protocol. Beep.', 'Loading game data. Emotions: disabled.'],
     brilliant: ['ERROR: BRILLIANCE OVERLOAD. {san} DETECTED.', 'Sacrifice calculated. Approval: 100 percent.'],
     great: ['Only-move located. Human performance: optimal.', 'Probability of finding this: low. You found it.'],
@@ -58,7 +58,7 @@ const COACHES = {
     miss: ['Opponent error not exploited. Recalibrate.', 'Free material ignored. Illogical.'],
     blunder: ['CRITICAL ERROR. CRITICAL ERROR.', 'Blunder registered. Does not compute.'],
     forced: ['Single legal move executed.'], rooksac: ['Rook offered. Material: negative. Initiative: positive.']},
-  captain: {name: 'Captain Checkmate', emoji: '🏴‍☠️', bg: 'linear-gradient(135deg,#16a34a,#065f46)', tag: 'Arr! Plunder their pieces!', voice: {pitch: .85, rate: 1},
+  captain: {name: 'Captain Checkmate', emoji: 'CC', bg: '#15803d', tag: 'Arr! Plunder their pieces!', voice: {pitch: .85, rate: 1},
     start: ["Ahoy! Let's see how ye sailed this one.", 'Hoist the sails, matey — review time!'],
     brilliant: ['Shiver me timbers! A legendary sacrifice!', 'Arr! {san} be worthy of a treasure chest!'],
     great: ['Ye found the only safe passage!', 'Steady hand on the wheel, matey!'],
@@ -71,7 +71,7 @@ const COACHES = {
     miss: ['Treasure on the deck and ye left it!', 'They dropped their gold and ye sailed past!'],
     blunder: ['Man overboard!', 'Walk the plank for that one!'],
     forced: ['Only one way through these straits.'], rooksac: ['Throwin\' the rook overboard! Bold!']},
-  luna: {name: 'Luna the Zen Knight', emoji: '🌙', bg: 'linear-gradient(135deg,#6366f1,#312e81)', tag: 'Breathe. See the whole board.', voice: {pitch: 1.1, rate: .85},
+  luna: {name: 'Luna the Zen Knight', emoji: 'LZ', bg: '#6d28d9', tag: 'Breathe. See the whole board.', voice: {pitch: 1.1, rate: .85},
     start: ['Breathe in. Let us walk through this game calmly.', 'Every game is a lesson. Let us listen.'],
     brilliant: ['Beautiful. You let go of material and found harmony.', 'A move of pure vision.'],
     great: ['You stayed calm and found the only path.', 'Focus rewarded.'],
@@ -92,7 +92,7 @@ function coachLine(kind, seed, san){
 }
 function coachAvatar(size = 52, badge){
   const c = coach();
-  return `<div class="cav" style="width:${size}px;height:${size}px;background:${c.bg};font-size:${size * .52}px" title="${esc(c.name)}">${c.emoji}${badge ? `<span class="cbdg">${clsIcon(badge, Math.round(size * .42))}</span>` : ''}</div>`;
+  return `<div class="cav" style="width:${size}px;height:${size}px;background:${c.bg};font-size:${size * .36}px" title="${esc(c.name)}">${c.emoji}${badge ? `<span class="cbdg">${clsIcon(badge, Math.round(size * .46))}</span>` : ''}</div>`;
 }
 
 /* ---------------- speech ---------------- */

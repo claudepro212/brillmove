@@ -313,9 +313,9 @@ class Engine {
   stop(){ this.send('stop'); }
 }
 class LiveEngine {
-  constructor(){ this.e = null; this.tok = 0; this.running = false; this.pend = false; }
+  constructor(mpv = 2, depth = 20){ this.mpv = mpv; this.depth = depth; this.e = null; this.tok = 0; this.running = false; this.pend = false; }
   start(fen, cb){
-    if (!this.e) this.e = new Engine();
+    if (!this.e) this.e = new Engine({multipv: this.mpv});
     this.fen = fen; this.cb = cb; this.tok++;
     if (this.running) { this.pend = true; this.e.stop(); return; }
     this.go();
@@ -331,7 +331,7 @@ class LiveEngine {
         if (this.pend) this.go(); else if (tok === this.tok) cb({depth, lines, fen, done: true});
       }
     };
-    this.e.ready.then(() => { this.e.ls.add(f); this.e.send('position fen ' + fen); this.e.send('go depth 20'); });
+    this.e.ready.then(() => { this.e.ls.add(f); this.e.send('position fen ' + fen); this.e.send('go depth ' + this.depth); });
   }
   stop(){ this.tok++; if (this.running && this.e) this.e.stop(); }
 }
@@ -569,7 +569,7 @@ async function loadUser(name){
     $('#home-err').textContent = ''; $('#q-opp').value = ''; $('#i-user').value = '';
     renderProfile(); renderRecent();
     $('#month').innerHTML = S.archives.map((u, i) => { const [y, m] = u.split('/').slice(-2); return `<option value="${i}">${new Date(+y, +m - 1).toLocaleString(undefined, {month: 'long', year: 'numeric'})}</option>`; }).join('');
-    showPlayer('games');
+    showPlayer(S.pendingTab || 'games'); S.pendingTab = null;
     if (!S.archives.length) { $('#glist').innerHTML = '<div class="card">This player has no games yet.</div>'; return; }
     await loadMonth(0);
   } catch(e) {
@@ -1590,18 +1590,19 @@ function setDemoTag(x){
    Views + events
    ============================================================ */
 function show(v){
-  for (const id of ['home', 'player', 'review', 'play']) $('#v-' + id).classList.toggle('hidden', id !== v);
+  for (const id of ['home', 'player', 'review', 'play', 'board', 'train']) $('#v-' + id).classList.toggle('hidden', id !== v);
   if (v !== 'review') { stopPlay(); live.stop(); }
-  $$('#nav button').forEach(b => b.classList.toggle('on', (v === 'player' && b.dataset.nav === S.ptab) || (v === 'play' && b.dataset.nav === 'play')));
+  $$('#nav button').forEach(b => b.classList.toggle('on', (v === 'player' && b.dataset.nav === S.ptab) || (v === 'play' && b.dataset.nav === 'play') || (v === 'board' && b.dataset.nav === 'board') || (v === 'train' && b.dataset.nav === 'train')));
 }
 function showPlayer(tab){
   S.ptab = tab; show('player');
   $$('#ptabs .tab').forEach(b => b.classList.toggle('on', b.dataset.pt === tab));
-  for (const t of ['games', 'insights', 'hunt', 'coach']) $('#pt-' + t).classList.toggle('hidden', t !== tab);
+  for (const t of ['games', 'insights', 'hunt', 'coach', 'openings']) $('#pt-' + t).classList.toggle('hidden', t !== tab);
   $$('#nav button').forEach(b => b.classList.toggle('on', b.dataset.nav === tab));
   if (tab === 'insights') renderInsights();
   if (tab === 'hunt') renderHunt();
   if (tab === 'coach') renderCoachTab();
+  if (tab === 'openings') renderOpenings();
 }
 function renderRecent(){
   const rec = store.get('gl2_recent', []);
@@ -1613,7 +1614,7 @@ function startPgn(){
 }
 
 $('#legend').innerHTML = ORDER.map(k => `<span class="pill" style="color:var(--text)">${clsIcon(k, 18)}${CLS[k].label}</span>`).join('');
-$('#fi-bril').innerHTML = clsIcon('brilliant', 30); $('#hunt-ic').innerHTML = clsIcon('brilliant', 18); $('#hunt-big').innerHTML = clsIcon('brilliant', 34);
+$('#hunt-ic').innerHTML = clsIcon('brilliant', 18); $('#hunt-big').innerHTML = clsIcon('brilliant', 34);
 $('#f-user').onsubmit = e => { e.preventDefault(); Sound.init && settings.sound && Sound.init(); loadUser($('#i-user').value); };
 $('#i-user').addEventListener('input', () => { $('#home-err').textContent = ''; Suggest.sel = -1; Suggest.lookup($('#i-user').value); Suggest.render(); });
 $('#i-user').addEventListener('focus', () => Suggest.render());
@@ -1630,7 +1631,7 @@ $('#recent').onclick = e => { const p = e.target.closest('[data-u]'); if (p) { $
 $('#t-pgn').onclick = () => $('#pgn-box').classList.toggle('hidden');
 $('#b-pgn').onclick = startPgn;
 $('#go-home').onclick = () => { show('home'); };
-$('#nav').onclick = e => { const b = e.target.closest('[data-nav]'); if (!b) return; if (b.dataset.nav === 'play') return openPlay(); if (S.user) return showPlayer(b.dataset.nav); const L = linkedAcc(); if (L) loadUser(L.u).then(() => showPlayer(b.dataset.nav)); else { show('home'); $('#i-user').focus(); toast('Enter your Chess.com username first'); } };
+$('#nav').onclick = e => { const b = e.target.closest('[data-nav]'); if (!b) return; if (b.dataset.nav === 'play') return openPlay(); if (b.dataset.nav === 'board') return openBoard(); if (b.dataset.nav === 'train') return openTrain(); if (S.user) return showPlayer(b.dataset.nav); const L = linkedAcc(); if (L) loadUser(L.u).then(() => showPlayer(b.dataset.nav)); else { show('home'); $('#i-user').focus(); toast('Enter your Chess.com username first'); } };
 $('#ptabs').onclick = e => { const b = e.target.closest('[data-pt]'); if (b) showPlayer(b.dataset.pt); };
 $('#month').onchange = e => loadMonth(+e.target.value);
 $('#tc-chips').onclick = e => { const c = e.target.closest('[data-tc]'); if (c) { S.tc = c.dataset.tc; renderGames(); } };

@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=9">
+<link rel="stylesheet" href="styles.css?v=10">
 <script src="vendor/chess.min.js"></script>
 </head>
 <body>
@@ -64,6 +64,7 @@
   <symbol id="ico-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
   <symbol id="ico-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></symbol>
   <symbol id="ico-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></symbol>
+  <symbol id="ico-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
   <symbol id="ico-rook" viewBox="0 0 24 24"><path d="M5 21h14M7 21v-3h10v3M8 18l1-8h6l1 8M7 10h10V4h-2.5v2h-2V4h-1v2h-2V4H7z"/></symbol>
 </svg>
 
@@ -73,10 +74,11 @@
   <div class="logo" id="go-home"><div class="mk"><img src="pieces/cburnett/wN.svg" alt=""></div><span>Brill<b>Move</b></span></div>
   <nav class="nav" id="nav">
     <button data-nav="games">My games</button>
-    <button data-nav="insights">Insights</button>
-    <button data-nav="coach">Coach report</button>
-    <button data-nav="hunt">Brilliant Hunter</button>
-    <button data-nav="play">Play the coach</button>
+    <button data-nav="coach">Coach</button>
+    <button data-nav="play">Play</button>
+    <button data-nav="train">Train</button>
+    <button data-nav="board">Analysis</button>
+    <button id="b-all" class="nav-all"><svg class="i sm"><use href="#ico-grid"/></svg>All features</button>
   </nav>
   <div class="sp"></div>
   <button class="btn sm ghost hidden" id="me-chip" title="Your linked account"></button>
@@ -84,6 +86,7 @@
   <button class="ibtn" id="b-theme" title="Dark mode" aria-label="Toggle dark mode"></button>
   <button class="ibtn" id="b-sound" title="Sound on/off" aria-label="Sound on/off"></button>
   <button class="ibtn" id="b-settings" title="Settings" aria-label="Settings"><svg class="i"><use href="#ico-sliders"/></svg></button>
+  <button class="ibtn menu-btn" id="b-menu" title="All features" aria-label="All features"><svg class="i"><use href="#ico-grid"/></svg></button>
   <button class="ibtn" id="b-gallery" title="Saved moments" aria-label="Saved moments"><svg class="i"><use href="#ico-bookmark"/></svg><span class="cnt hidden" id="saved-n">0</span></button>
 </header>
 
@@ -120,6 +123,12 @@
     </div>
   </div>
 
+  <div class="section" id="launch-sec" style="margin-top:48px">
+    <h2 class="sec-t">What do you want to do?</h2>
+    <p class="sec-s">Every feature is free. Pick one to jump straight in.</p>
+    <div class="launch" id="launch"></div>
+  </div>
+
   <div class="section">
     <h2 class="sec-t">How it works</h2>
     <p class="sec-s">From username to full review in under 30 seconds.</p>
@@ -130,26 +139,10 @@
     </div>
   </div>
 
-  <div class="section">
-    <h2 class="sec-t">Everything you need to improve</h2>
-    <p class="sec-s">All features are free. No daily limits.</p>
-    <div class="feats">
-      <div class="feat"><div class="ic" id="fi-bril"></div><h3>Every move rated</h3><p>Brilliant, Great, Best, Excellent, Good, Book, Inaccuracy, Mistake, Miss and Blunder, counted for both players.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-bulb"/></svg></div><h3>What you could have played</h3><p>For every slip, see the better move, why it was better, and the full engine line. Play it out on the board.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-next"/></svg></div><h3>Move-by-move replay</h3><p>Big forward and back controls, keyboard arrows, autoplay, and a jump straight to the key moments.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-target"/></svg></div><h3>Accuracy &amp; game rating</h3><p>Accuracy for each player, an estimated performance rating, and accuracy by opening, middlegame and endgame.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-msg"/></svg></div><h3>Six free coaches</h3><p>Pick a coach whose style you like. They comment on each move and can read their advice out loud.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-spark"/></svg></div><h3>Brilliant Hunter</h3><p>Scan your last 5, 10 or 20 games at once and collect every brilliant and great move you've played.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-undo"/></svg></div><h3>Retry your mistakes</h3><p>Your own mistakes become puzzles. Find the move you missed, with a hint if you need one.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-trend"/></svg></div><h3>Player insights</h3><p>Rating trend, best openings as White and Black, longest streak, best win and how your games end.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-chart"/></svg></div><h3>Coach report</h3><p>Your coach reads your last 10–30 games and tells you your weakest points, your strengths, your style and what to practice.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-swords"/></svg></div><h3>Play the coach</h3><p>Practice against 7 strength levels. Your coach comments on every move and profiles your playing style live.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-user"/></svg></div><h3>Link your account</h3><p>Link your Chess.com username once. Next time you visit after a game, your coach offers to review it with you.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-phone"/></svg></div><h3>Install it as an app</h3><p>Add BrillMove to your phone or computer. It opens full screen, and the engine stays saved for faster reviews.</p><button class="btn sm soft b-install" style="margin-top:12px">Install BrillMove</button></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-link"/></svg></div><h3>Share any review</h3><p>Every Chess.com game gets its own link. Send a friend straight to your brilliant move, or to the full review.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-moon"/></svg></div><h3>Light and dark mode</h3><p>Easy on the eyes day or night, with board colors and seven piece sets to choose from.</p></div>
-      <div class="feat"><div class="ic"><svg class="i"><use href="#ico-image"/></svg></div><h3>Share cards</h3><p>Turn a great move or a full game summary into a clean image you can download or copy.</p></div>
-    </div>
+  <div class="section" id="classics-sec">
+    <h2 class="sec-t">Classic brilliancies</h2>
+    <p class="sec-s">The most famous sacrifices in chess history. Review them, or try to guess every move.</p>
+    <div class="classics" id="classics"></div>
   </div>
 
   <div class="section">
@@ -170,6 +163,7 @@
   <div class="tabs" id="ptabs">
     <button class="tab on" data-pt="games"><svg class="i sm"><use href="#ico-list"/></svg>Games</button>
     <button class="tab" data-pt="insights"><svg class="i sm"><use href="#ico-trend"/></svg>Insights</button>
+    <button class="tab" data-pt="openings"><svg class="i sm"><use href="#ico-flag"/></svg>Openings</button>
     <button class="tab" data-pt="coach"><svg class="i sm"><use href="#ico-target"/></svg>Coach report</button>
     <button class="tab" data-pt="hunt"><span id="hunt-ic"></span>Brilliant Hunter</button>
   </div>
@@ -190,6 +184,7 @@
   </div>
 
   <div id="pt-coach" class="hidden"></div>
+  <div id="pt-openings" class="hidden"></div>
 
   <div id="pt-hunt" class="hidden">
     <div class="card">
@@ -302,6 +297,44 @@
     <div class="side" id="play-side"></div>
   </div>
 </section>
+<!-- ================= ANALYSIS BOARD ================= -->
+<section id="v-board" class="hidden">
+  <div class="rv">
+    <div class="bcol">
+      <div class="pbar"><b id="ab-turn">White to move</b><span class="dim" id="ab-depth" style="margin-left:auto;font-size:13px"></span></div>
+      <div class="bwrap">
+        <div class="evb"><div class="f" id="ab-evf" style="height:50%"></div><span id="ab-evt"></span></div>
+        <div class="bholder"><div id="ab-board"></div></div>
+      </div>
+      <div class="navi"><div class="tools" id="ab-tools" style="padding:8px">
+        <button class="btn sm" data-ab="undo"><svg class="i sm"><use href="#ico-undo"/></svg>Undo</button>
+        <button class="btn sm" data-ab="flip"><svg class="i sm"><use href="#ico-flip"/></svg>Flip</button>
+        <button class="btn sm" data-ab="reset">Reset</button>
+        <button class="btn sm" data-ab="copy"><svg class="i sm"><use href="#ico-copy"/></svg>Copy FEN</button>
+        <button class="btn sm soft" data-ab="review"><svg class="i sm"><use href="#ico-chart"/></svg>Review these moves</button>
+      </div></div>
+    </div>
+    <div class="side">
+      <div class="card"><h4><svg class="i sm"><use href="#ico-cpu"/></svg>Stockfish 17 · top lines<span class="sub">click a line to play it</span></h4><div class="ab-lines" id="ab-lines"></div></div>
+      <div class="card"><h4><svg class="i sm"><use href="#ico-list"/></svg>Moves</h4><div class="ab-moves" id="ab-moves"></div></div>
+      <div class="card" id="ab-tools2"><h4><svg class="i sm"><use href="#ico-copy"/></svg>Load a position</h4>
+        <textarea id="ab-in" class="in" placeholder="Paste a FEN or a whole PGN" style="width:100%;min-height:80px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;resize:vertical"></textarea>
+        <div class="row" style="margin-top:8px"><button class="btn sm pri" id="ab-load" data-ab="load">Load</button><input class="in" id="ab-fen" readonly style="flex:1;min-width:0;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--muted)" aria-label="Current FEN"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GUESS THE MOVE ================= -->
+<section id="v-train" class="hidden">
+  <div class="rv">
+    <div class="bcol">
+      <div class="pbar" id="tr-top"></div>
+      <div class="bholder"><div id="tr-board"></div></div>
+      <div class="pbar" id="tr-bot"></div>
+    </div>
+    <div class="side" id="tr-side"></div>
+  </div>
+</section>
 </main>
 
 <footer>
@@ -319,9 +352,10 @@
 </footer>
 
 <div class="modal hidden" id="modal"><div class="mbox" id="mbox"></div></div>
-<script src="fx.js?v=8"></script>
-<script src="app.js?v=8"></script>
-<script src="coach.js?v=8"></script>
-<script src="extras.js?v=8"></script>
+<script src="fx.js?v=10"></script>
+<script src="app.js?v=10"></script>
+<script src="coach.js?v=10"></script>
+<script src="extras.js?v=10"></script>
+<script src="labs.js?v=10"></script>
 </body>
 </html>

@@ -276,7 +276,8 @@ function kingInCheck(fen){
 
 /* ---------------- engine ---------------- */
 class Engine {
-  constructor(){
+  constructor(o = {}){
+    this.mpv = o.multipv || 2;
     this.ls = new Set(); this.q = Promise.resolve();
     this.w = new Worker('engine/stockfish.js');
     this.w.onmessage = e => { const l = String(e.data); for (const f of [...this.ls]) f(l); };
@@ -287,7 +288,7 @@ class Engine {
   waitFor(pred){ return new Promise(res => { const f = l => { if (pred(l)) { this.ls.delete(f); res(l); } }; this.ls.add(f); }); }
   async init(){
     const a = this.waitFor(l => l === 'uciok'); this.send('uci'); await a;
-    this.send('setoption name Hash value 32'); this.send('setoption name MultiPV value 2');
+    this.send('setoption name Hash value 32'); this.send('setoption name MultiPV value ' + this.mpv);
     const b = this.waitFor(l => l === 'readyok'); this.send('isready'); await b;
   }
   static parse(l){
@@ -296,7 +297,8 @@ class Engine {
     return {mp: +((l.match(/ multipv (\d+)/) || [0, 1])[1]), depth: +((l.match(/ depth (\d+)/) || [0, 0])[1]),
       type: sm[1], v: +sm[2], pv: l.split(' pv ')[1].trim().split(/\s+/).slice(0, 12)};
   }
-  analyse(fen, depth){
+  analyse(fen, depth){ return this.run(fen, 'go depth ' + depth); }
+  run(fen, goCmd, pre = []){
     const job = () => new Promise(res => {
       const lines = {};
       const f = l => {
@@ -304,7 +306,7 @@ class Engine {
         if (p) lines[p.mp] = {type: p.type, v: p.v, pv: p.pv};
         else if (l.startsWith('bestmove')) { this.ls.delete(f); const bm = l.split(/\s+/)[1]; res({best: bm && bm !== '(none)' ? bm : null, lines}); }
       };
-      this.ls.add(f); this.send('position fen ' + fen); this.send('go depth ' + depth);
+      this.ls.add(f); for (const c of pre) this.send(c); this.send('position fen ' + fen); this.send(goCmd);
     });
     const p = this.q.then(() => this.ready).then(job); this.q = p.catch(() => {}); return p;
   }
@@ -580,7 +582,8 @@ function renderProfile(){
       <div class="muted" style="font-size:13px;margin-top:4px">${p.name ? esc(p.name) + ' · ' : ''}${joined ? 'Member since ' + joined : ''}${p.followers ? ' · ' + p.followers.toLocaleString() + ' followers' : ''}</div>
       <div class="rats">${tile('chess_bullet', 'Bullet')}${tile('chess_blitz', 'Blitz')}${tile('chess_rapid', 'Rapid')}${tile('chess_daily', 'Daily')}${st.tactics && st.tactics.highest ? `<div class="rat"><small>Puzzles</small><b>${st.tactics.highest.rating}</b></div>` : ''}</div>
     </div>
-    <button class="btn sm" id="b-chg" style="position:relative;z-index:1">Change player</button>`;
+    <div class="row"><span id="link-slot"></span><button class="btn sm" id="b-chg">Change player</button></div>`;
+  renderLinkSlot();
   $('#b-chg').onclick = () => { show('home'); $('#i-user').focus(); $('#i-user').select(); };
 }
 async function loadMonth(i){
@@ -791,7 +794,7 @@ function openReview(G, opts = {}){
   R.flipped = G.meta.userColor === 'b';
   if (!board) initBoard();
   show('review'); window.scrollTo(0, 0);
-  setTab(opts.ply ? 'moves' : 'report');
+  setTab(opts.tab || (opts.ply ? 'moves' : 'report'));
   $('#retry-card').classList.add('hidden'); $('#explore-card').classList.add('hidden'); $('#coach-card').classList.remove('hidden');
   fetchAvatars(G);
   renderAll();
@@ -941,7 +944,9 @@ function renderCoach(){
       <div class="why">${betterWhy(G, R.ply - 1)}${strong && m.note ? ' ' + m.note : ''}</div>
       ${m.bestLine.length > 1 ? `<div class="ln">Line: ${lineHTML(G, R.ply, m.bestLine)}</div>` : ''}</div>`;
     $('#b-showbest').classList.remove('hidden');
-  } else if (['best', 'brilliant', 'great'].includes(m.cls)) {
+  } else if (['brilliant', 'great'].includes(m.cls)) {
+    bt.innerHTML = whyBoxHTML(G, R.ply - 1);
+  } else if (m.cls === 'best') {
     bt.innerHTML = `<div class="better ok"><div class="hd">${icon('checkc', 'sm')}You found the engine's top move</div>
       ${m.bestLine.length > 1 ? `<div class="ln">Line: ${lineHTML(G, R.ply, m.bestLine)}</div>` : ''}</div>`;
   }
@@ -1427,14 +1432,19 @@ function setDemoTag(x){
 /* ============================================================
    Views + events
    ============================================================ */
-function show(v){ for (const id of ['home', 'player', 'review']) $('#v-' + id).classList.toggle('hidden', id !== v); if (v !== 'review') { stopPlay(); live.stop(); } $$('#nav button').forEach(b => b.classList.toggle('on', v === 'player' && b.dataset.nav === S.ptab)); }
+function show(v){
+  for (const id of ['home', 'player', 'review', 'play']) $('#v-' + id).classList.toggle('hidden', id !== v);
+  if (v !== 'review') { stopPlay(); live.stop(); }
+  $$('#nav button').forEach(b => b.classList.toggle('on', (v === 'player' && b.dataset.nav === S.ptab) || (v === 'play' && b.dataset.nav === 'play')));
+}
 function showPlayer(tab){
   S.ptab = tab; show('player');
   $$('#ptabs .tab').forEach(b => b.classList.toggle('on', b.dataset.pt === tab));
-  for (const t of ['games', 'insights', 'hunt']) $('#pt-' + t).classList.toggle('hidden', t !== tab);
+  for (const t of ['games', 'insights', 'hunt', 'coach']) $('#pt-' + t).classList.toggle('hidden', t !== tab);
   $$('#nav button').forEach(b => b.classList.toggle('on', b.dataset.nav === tab));
   if (tab === 'insights') renderInsights();
   if (tab === 'hunt') renderHunt();
+  if (tab === 'coach') renderCoachTab();
 }
 function renderRecent(){
   const rec = store.get('gl2_recent', []);
@@ -1452,7 +1462,7 @@ $('#recent').onclick = e => { const p = e.target.closest('[data-u]'); if (p) { $
 $('#t-pgn').onclick = () => $('#pgn-box').classList.toggle('hidden');
 $('#b-pgn').onclick = startPgn;
 $('#go-home').onclick = () => { show('home'); };
-$('#nav').onclick = e => { const b = e.target.closest('[data-nav]'); if (b && S.user) showPlayer(b.dataset.nav); };
+$('#nav').onclick = e => { const b = e.target.closest('[data-nav]'); if (!b) return; if (b.dataset.nav === 'play') return openPlay(); if (S.user) return showPlayer(b.dataset.nav); const L = linkedAcc(); if (L) loadUser(L.u).then(() => showPlayer(b.dataset.nav)); else { show('home'); $('#i-user').focus(); toast('Enter your Chess.com username first'); } };
 $('#ptabs').onclick = e => { const b = e.target.closest('[data-pt]'); if (b) showPlayer(b.dataset.pt); };
 $('#month').onchange = e => loadMonth(+e.target.value);
 $('#tc-chips').onclick = e => { const c = e.target.closest('[data-tc]'); if (c) { S.tc = c.dataset.tc; renderGames(); } };

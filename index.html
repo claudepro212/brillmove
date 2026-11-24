@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="styles.css?v=4">
 <script src="vendor/chess.min.js"></script>
 </head>
 <body>
@@ -61,12 +61,15 @@
 
 <header>
   <div class="logo" id="go-home"><div class="mk"><img src="pieces/cburnett/wN.svg" alt=""></div><span>Brill<b>Move</b></span></div>
-  <nav class="nav hidden" id="nav">
+  <nav class="nav" id="nav">
     <button data-nav="games">My games</button>
     <button data-nav="insights">Insights</button>
+    <button data-nav="coach">Coach report</button>
     <button data-nav="hunt">Brilliant Hunter</button>
+    <button data-nav="play">Play the coach</button>
   </nav>
   <div class="sp"></div>
+  <button class="btn sm ghost hidden" id="me-chip" title="Your linked account"></button>
   <button class="ibtn" id="b-sound" title="Sound on/off" aria-label="Sound on/off"></button>
   <button class="ibtn" id="b-settings" title="Settings" aria-label="Settings"><svg class="i"><use href="#i-sliders"/></svg></button>
   <button class="ibtn" id="b-gallery" title="Saved moments" aria-label="Saved moments"><svg class="i"><use href="#i-bookmark"/></svg><span class="cnt hidden" id="saved-n">0</span></button>
@@ -91,6 +94,7 @@
         <span><svg class="i sm"><use href="#i-check"/></svg>No sign-up</span>
         <span><svg class="i sm"><use href="#i-check"/></svg>Runs in your browser</span>
       </div>
+      <div id="home-linked" style="max-width:540px;margin-top:16px"></div>
       <div class="recent" id="recent"></div>
       <div class="alt">Have a PGN from another site? <button id="t-pgn">Paste it here</button></div>
       <div class="pgnbox hidden" id="pgn-box">
@@ -126,6 +130,9 @@
       <div class="feat"><div class="ic"><svg class="i"><use href="#i-spark"/></svg></div><h3>Brilliant Hunter</h3><p>Scan your last 5, 10 or 20 games at once and collect every brilliant and great move you've played.</p></div>
       <div class="feat"><div class="ic"><svg class="i"><use href="#i-undo"/></svg></div><h3>Retry your mistakes</h3><p>Your own mistakes become puzzles. Find the move you missed, with a hint if you need one.</p></div>
       <div class="feat"><div class="ic"><svg class="i"><use href="#i-trend"/></svg></div><h3>Player insights</h3><p>Rating trend, best openings as White and Black, longest streak, best win and how your games end.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#i-chart"/></svg></div><h3>Coach report</h3><p>Your coach reads your last 10–30 games and tells you your weakest points, your strengths, your style and what to practice.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#i-swords"/></svg></div><h3>Play the coach</h3><p>Practice against 7 strength levels. Your coach comments on every move and profiles your playing style live.</p></div>
+      <div class="feat"><div class="ic"><svg class="i"><use href="#i-user"/></svg></div><h3>Link your account</h3><p>Link your Chess.com username once. Next time you visit after a game, your coach offers to review it with you.</p></div>
       <div class="feat"><div class="ic"><svg class="i"><use href="#i-image"/></svg></div><h3>Share cards</h3><p>Turn a great move or a full game summary into a clean image you can download or copy.</p></div>
     </div>
   </div>
@@ -138,7 +145,7 @@
 
   <div class="cta-band">
     <div><h3>Ready to see your brilliant moves?</h3><p>It takes ten seconds and it's always free.</p></div>
-    <button class="btn lg" id="b-cta">Review my games</button>
+    <div class="row"><button class="btn lg" id="b-cta">Review my games</button><button class="btn lg" id="b-play-home" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.5)">Play the coach</button></div>
   </div>
 </section>
 
@@ -148,6 +155,7 @@
   <div class="tabs" id="ptabs">
     <button class="tab on" data-pt="games"><svg class="i sm"><use href="#i-list"/></svg>Games</button>
     <button class="tab" data-pt="insights"><svg class="i sm"><use href="#i-trend"/></svg>Insights</button>
+    <button class="tab" data-pt="coach"><svg class="i sm"><use href="#i-target"/></svg>Coach report</button>
     <button class="tab" data-pt="hunt"><span id="hunt-ic"></span>Brilliant Hunter</button>
   </div>
 
@@ -165,6 +173,8 @@
     <div class="toolbar"><div class="chips" id="per-chips"></div><span class="dim" id="ins-note"></span></div>
     <div class="ins" id="ins"></div>
   </div>
+
+  <div id="pt-coach" class="hidden"></div>
 
   <div id="pt-hunt" class="hidden">
     <div class="card">
@@ -263,6 +273,20 @@
     </div>
   </div>
 </section>
+<!-- ================= PLAY THE COACH ================= -->
+<section id="v-play" class="hidden">
+  <div class="rv">
+    <div class="bcol">
+      <div class="pbar" id="pp-top"></div>
+      <div class="bwrap">
+        <div class="evb hidden" id="play-evb"><div class="f" id="play-evf" style="height:50%"></div></div>
+        <div class="bholder"><div id="play-board"></div></div>
+      </div>
+      <div class="pbar" id="pp-bot"></div>
+    </div>
+    <div class="side" id="play-side"></div>
+  </div>
+</section>
 </main>
 
 <footer>
@@ -280,7 +304,8 @@
 </footer>
 
 <div class="modal hidden" id="modal"><div class="mbox" id="mbox"></div></div>
-<script src="fx.js?v=3"></script>
-<script src="app.js?v=3"></script>
+<script src="fx.js?v=4"></script>
+<script src="app.js?v=4"></script>
+<script src="coach.js?v=4"></script>
 </body>
 </html>
